@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -97,23 +98,40 @@ public class SoFurry extends Site {
 		// rating
 		// we have to click on the span silbling as the input is invisible
 		if (imageInfo.getSexualRating() == RatingSexual.NONE && imageInfo.getViolenceRating() == RatingViolence.NONE) {
-			driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_0']/..")).click();
-			//driver.findElement(By.id("UploadForm_contentLevel_0")).click();
+			//driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_0']/../span")).click();
+			// forcing it to be clicked through js as above way stopped to work for some reason
+			//TODO: why tho? makes no sense
+			((JavascriptExecutor)driver).executeScript("arguments[0].click()", driver.findElement(By.id("UploadForm_contentLevel_0")));
 		} else {
 			// check just for cub here, rest the user can choose himself afterwards but cub could bring drama
 			if (getTags(imageInfo).trim().matches("^(.*, )*cub(, .*)*$")) {
-				driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_2']/..")).click();
+				//driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_2']/../span")).click();
+				// forcing it to be clicked through js as above way stopped to work for some reason
+				//TODO: why tho? makes no sense
+				((JavascriptExecutor)driver).executeScript("arguments[0].click()", driver.findElement(By.id("UploadForm_contentLevel_2")));
 			} else {
-				driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_1']/..")).click();
+				//driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_1']/../span")).click();
+				// forcing it to be clicked through js as above way stopped to work for some reason
+				//TODO: why tho? makes no sense
+				((JavascriptExecutor)driver).executeScript("arguments[0].click()", driver.findElement(By.id("UploadForm_contentLevel_1")));
 			}
 		}
 		
 		if (imageInfo.isUnlisted()) {
-			driver.findElement(By.xpath("//input[@id='UploadForm_P_hidePublic_3']/../span")).click();
+			//driver.findElement(By.xpath("//input[@id='UploadForm_P_hidePublic_3']/../span")).click();
+			// forcing it to be clicked through js as above way stopped to work for some reason
+			//TODO: why tho? makes no sense
+			((JavascriptExecutor)driver).executeScript("arguments[0].click()", driver.findElement(By.id("UploadForm_P_hidePublic_3")));
 		} else if (imageInfo.isFriendsOnly()) {
-			driver.findElement(By.xpath("//input[@id='UploadForm_P_hidePublic_2']/../span")).click();
+			//driver.findElement(By.xpath("//input[@id='UploadForm_P_hidePublic_2']/../span")).click();
+			// forcing it to be clicked through js as above way stopped to work for some reason
+			//TODO: why tho? makes no sense
+			((JavascriptExecutor)driver).executeScript("arguments[0].click()", driver.findElement(By.id("UploadForm_P_hidePublic_2")));
 		} else {
-			driver.findElement(By.xpath("//input[@id='UploadForm_P_hidePublic_0']/../span")).click();
+			//driver.findElement(By.xpath("//input[@id='UploadForm_P_hidePublic_0']/../span")).click();
+			// forcing it to be clicked through js as above way stopped to work for some reason
+			//TODO: why tho? makes no sense
+			((JavascriptExecutor)driver).executeScript("arguments[0].click()", driver.findElement(By.id("UploadForm_P_hidePublic_0")));
 		}
 		
 		if (!imageInfo.getDescription().isEmpty()) {
@@ -123,8 +141,10 @@ public class SoFurry extends Site {
 		String tags = getTags(imageInfo);
 		driver.findElement(By.id("sf-upload-tags")).sendKeys(tags);
 		
-		// click in descr. form to hide autocomplete
-		driver.findElement(By.className("bigsubmit")).click();
+		//driver.findElement(By.className("bigsubmit")).click();
+		// forcing it to be clicked through js as above way stopped to work for some reason
+		//TODO: why tho? makes no sense
+		((JavascriptExecutor)driver).executeScript("arguments[0].click()", driver.findElement(By.className("bigsubmit")));
 		
 		showFinishMessage(driver);
 		

@@ -1,13 +1,8 @@
-package klaue.furrycrossposter.sites;
+package klaue.furrycrossposter.sites.sofurry;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-
-import klaue.furrycrossposter.ImageInfo;
-import klaue.furrycrossposter.ImageInfo.Gender;
-import klaue.furrycrossposter.ImageInfo.RatingSexual;
-import klaue.furrycrossposter.ImageInfo.RatingViolence;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -16,12 +11,53 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import klaue.furrycrossposter.FurryCrossposter;
+import klaue.furrycrossposter.ImageInfo;
+import klaue.furrycrossposter.ImageInfo.Gender;
+import klaue.furrycrossposter.ImageInfo.RatingSexual;
+import klaue.furrycrossposter.ImageInfo.RatingViolence;
+import klaue.furrycrossposter.sites.Site;
+
 public class SoFurry extends Site {
 	private WebDriver driver;
+	private String user = null;
+	private String password = null;
+	Path sofurryPropertiesPath = FurryCrossposter.workingDir.resolve("sofurry.properties");
 	
 	@Override
-	public boolean doUpload(ImageInfo imageInfo) {
+	public boolean doUpload(final ImageInfo imageInfo) {
 		if (!canUpload(imageInfo)) return false;
+		
+//		String[] credentials = getUserPassword(sofurryPropertiesPath);
+//		if (credentials == null) return false; // no uplad without user/pass
+//		
+//		user = credentials[0];
+//		password = credentials[1];
+//		
+//		SoFurryAuthentification soa = new SoFurryAuthentification(user, password);
+//		// first request the submission of the furrycrossposter-image so we don't have to send the whole file to upload
+//		// multiple time for sofurrys OTP login
+//		TreeMap<String, String> params = new TreeMap<>();
+//		params.put("id", "1043958");
+//		String reply = soa.requestPost("http://api2.sofurry.com/std/getSubmissionDetails", params);
+//		if (reply == null) {
+//			JOptionPane.showMessageDialog(null, "Could not log in to SoFurry", "Error", JOptionPane.ERROR_MESSAGE);
+//			// remove the entries from the properties
+//			removeUserPasswordFromProperties(sofurryPropertiesPath);
+//			return false;
+//		}
+//		
+//		// if we came to this area, it means username worked and all, yay, so let's upload our file
+//		params = new TreeMap<>();
+//		params.put("f", "postBinary");
+//		params.put("id", ""); // new
+//		params.put("contentType", "artwork");
+//		params.put("cb", "496"); // no clue what this is for
+//		reply = soa.requestPostMultipart("https://chat.sofurry.com/ajaxfetch.php", params, "file", imageInfo.getImagePath().toFile());
+//		System.out.println(reply);
+//		
+//		return true;
+
 		Path imagePath = imageInfo.getImagePath();
 		Path thumbPath = imageInfo.getThumbPath();
 		
@@ -34,8 +70,7 @@ public class SoFurry extends Site {
 		WebDriverWait wait = new WebDriverWait(driver, 60);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@href='/upload']")));
 		
-		driver.findElement(By.xpath("//a[@href='/upload']")).click();
-		driver.findElement(By.xpath("//a[@href='/upload/details?contentType=1']")).click();
+		driver.get("https://www.sofurry.com/upload/details?contentType=1");
 		
 		driver.findElement(By.id("UploadForm_P_title")).sendKeys(imageInfo.getTitle());
 		
@@ -62,14 +97,14 @@ public class SoFurry extends Site {
 		// rating
 		// we have to click on the span silbling as the input is invisible
 		if (imageInfo.getSexualRating() == RatingSexual.NONE && imageInfo.getViolenceRating() == RatingViolence.NONE) {
-			driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_0']/../span")).click();
+			driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_0']/..")).click();
 			//driver.findElement(By.id("UploadForm_contentLevel_0")).click();
 		} else {
 			// check just for cub here, rest the user can choose himself afterwards but cub could bring drama
 			if (getTags(imageInfo).trim().matches("^(.*, )*cub(, .*)*$")) {
-				driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_2']/../span")).click();
+				driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_2']/..")).click();
 			} else {
-				driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_1']/../span")).click();
+				driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_1']/..")).click();
 			}
 		}
 		

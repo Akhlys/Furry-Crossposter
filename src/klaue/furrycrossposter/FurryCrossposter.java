@@ -122,7 +122,6 @@ public class FurryCrossposter extends JFrame {
 		} else {
 			System.out.println("loaded chrome profile path " + FurryCrossposter.chromeProfile);
 		}
-
 	}
 	
 	public static void main(String[] args) {

@@ -65,8 +65,8 @@ import klaue.furrycrossposter.sites.FurAffinity;
 import klaue.furrycrossposter.sites.FurryNetwork;
 import klaue.furrycrossposter.sites.InkBunny;
 import klaue.furrycrossposter.sites.Site;
-import klaue.furrycrossposter.sites.SoFurry;
 import klaue.furrycrossposter.sites.Weasyl;
+import klaue.furrycrossposter.sites.sofurry.SoFurry;
 import layout.TableLayout;
 import layout.TableLayoutConstraints;
 

@@ -43,7 +43,7 @@ public class FurryCrossposter extends JFrame {
 		
 		new Thread(splash).start();
 		
-		gatherData();
+		gatherData(splash);
 		new MainWindow();
 		
 		splash.stop();
@@ -53,7 +53,7 @@ public class FurryCrossposter extends JFrame {
 	 * tries to gather the data from the user directory or starts the first run wizard if none around
 	 */
 	@SuppressWarnings("unchecked")
-	private void gatherData() {
+	private void gatherData(SplashScreen splash) {
 		// if it's there but a file, delete it
 		if (Files.exists(workingDir) && !Files.isDirectory(workingDir)) {
 			try {
@@ -83,6 +83,7 @@ public class FurryCrossposter extends JFrame {
 		// if it doesn't contain the tag file, first start wizard did not run
 		if (!Files.exists(workingDir.resolve("tags"))) {
 			// data dir does not exist or is empty, first start wizard
+			splash.stop();
 			new FirstStart(workingDir);
 		}
 		
@@ -129,7 +130,6 @@ public class FurryCrossposter extends JFrame {
 		} else {
 			System.out.println("loaded chrome profile path " + FurryCrossposter.chromeProfile);
 		}
-
 	}
 	
 	public static void main(String[] args) {

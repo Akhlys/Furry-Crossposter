@@ -46,6 +46,7 @@ public class InkBunny extends Site {
 				Path newImgPath = FurryCrossposter.workingDir.resolve(imagePath.getFileName());
 				ImageTools.getResizedFile(36000000, image, newImgPath.toFile());
 				imagePath = newImgPath;
+				// newImgPath.toFile().deleteOnExit(); seems not to work
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -63,6 +64,7 @@ public class InkBunny extends Site {
 					Path newImgPath = FurryCrossposter.workingDir.resolve(imagePath.getFileName());
 					ImageTools.getResizedFile(36000000, image, newImgPath.toFile());
 					thumbPath = newImgPath;
+					//newImgPath.toFile().deleteOnExit(); seems not to work
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -221,6 +223,15 @@ public class InkBunny extends Site {
 		}
 		
 		showFinishMessage(driver);
+		
+		// delete img/thumb if resized to working dir
+		try {
+			if (imagePath.getParent().equals(FurryCrossposter.workingDir)) Files.delete(imagePath);
+			if (thumbPath != null && thumbPath.getParent().equals(FurryCrossposter.workingDir))  Files.delete(thumbPath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		//driver.quit();
 		return true;

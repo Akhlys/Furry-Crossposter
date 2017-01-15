@@ -45,10 +45,11 @@ public class FurAffinity extends Site {
 				Path newImgPath = FurryCrossposter.workingDir.resolve(imagePath.getFileName());
 				ImageTools.getResizedFile(1280, 1280, image, newImgPath.toFile());
 				imagePath = newImgPath;
+				//newImgPath.toFile().deleteOnExit(); seems not to work
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Could not resize image file that is over 36MP", "Furry Crossposter - InkBunny", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Could not resize image file that has width or height over 1280", "Furry Crossposter - Furaffinity", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 
@@ -62,6 +63,7 @@ public class FurAffinity extends Site {
 					Path newImgPath = FurryCrossposter.workingDir.resolve(imagePath.getFileName());
 					ImageTools.getResizedFile(1280, 1280, image, newImgPath.toFile());
 					thumbPath = newImgPath;
+					//newImgPath.toFile().deleteOnExit(); seems not to work
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -226,6 +228,15 @@ public class FurAffinity extends Site {
 		driver.findElement(By.xpath("//input[@value='Finalize']")).click();
 		
 		showFinishMessage(driver);
+		
+		// delete img/thumb if resized to working dir
+		try {
+			if (imagePath.getParent().equals(FurryCrossposter.workingDir)) Files.delete(imagePath);
+			if (thumbPath != null && thumbPath.getParent().equals(FurryCrossposter.workingDir))  Files.delete(thumbPath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		//driver.quit();
 		return true;

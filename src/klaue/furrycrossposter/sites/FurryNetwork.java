@@ -101,6 +101,12 @@ public class FurryNetwork extends Site {
 			// selecting first, clearing wont work if not
 			WebElement title = form.findElement(By.cssSelector("[id$=-title]"));
 			title.findElement(By.xpath("..")).click();
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			title.clear();
 			title.sendKeys(imageInfo.getTitle());
 		}
@@ -165,10 +171,10 @@ public class FurryNetwork extends Site {
 		// now we have the confirm message
 		WebElement confirmForm = driver.findElement(By.className("panel__content"));
 		boolean notificationCheckboxSelected = confirmForm.findElement(By.id("publish")).isSelected();
-		if (notificationCheckboxSelected = imageInfo.hasNoNotification()) {
+		if (notificationCheckboxSelected && imageInfo.hasNoNotification()) {
 			confirmForm.findElement(By.className("checkbox-input__label")).click();
 		}
-		confirmForm.findElement(By.className("button--action--create")).click();
+		//confirmForm.findElement(By.className("button--action--create")).click();
 		
 		// open correct end url
 		// TODO: timeout or else the confirm dialog will not be correctly submitted

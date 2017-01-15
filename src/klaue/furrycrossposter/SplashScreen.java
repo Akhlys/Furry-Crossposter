@@ -46,7 +46,7 @@ public class SplashScreen extends JWindow implements Runnable {
         pack();
 		setSize(img.getWidth(), img.getHeight()); 
         setLocationRelativeTo(null);
-        setAlwaysOnTop(true);
+        //setAlwaysOnTop(true);
 	}
 
 	@Override
@@ -71,18 +71,18 @@ public class SplashScreen extends JWindow implements Runnable {
 	}
 	
 	public void stop() {
-		if (img != null) {
+		if (img != null && this.isVisible()) {
 			// it looks nicer when it stays just a bit longer
-			try {
-				if (isPerPixelTranslucencySupported) {
-					// do not go under 70 or it flickers
-					fadeOut(5, 100);
-				} else {
-					Thread.sleep(500);
-				}
-			} catch (InterruptedException e) {
-				// not really important, just ignore
-			}
+//			try {
+//				if (isPerPixelTranslucencySupported) {
+//					// do not go under 70 or it flickers
+//					fadeOut(5, 100);
+//				} else {
+//					Thread.sleep(500);
+//				}
+//			} catch (InterruptedException e) {
+//				// not really important, just ignore
+//			}
 			setVisible(false);
 			dispose();
 		}

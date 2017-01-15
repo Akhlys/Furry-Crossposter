@@ -115,6 +115,7 @@ public class FirstStart extends JDialog implements WindowListener {
 				options.addArguments("user-data-dir=" + profileDir);
 				options.addArguments("profile-directory=" + chromeProfilePath.getFileName().toString());
 				options.addArguments("--start-maximized");
+				options.addArguments("--no-sandbox");
 				DesiredCapabilities desiredCapabilities = DesiredCapabilities.chrome();
 				desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, options);
 				WebDriver webDriver = new ChromeDriver(desiredCapabilities);

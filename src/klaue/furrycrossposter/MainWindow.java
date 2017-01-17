@@ -53,8 +53,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.filechooser.FileView;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -123,20 +121,9 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 	
 	public MainWindow() {
 		imageInfo.addChangeListener(this);
-		
-		String userhome = System.getProperty("user.home");
-		fileChooser.setCurrentDirectory(new File(userhome +"\\Pictures"));
-		
 		FileFilter imageFilter = new FileNameExtensionFilter("Image files", "jpg", "jpeg", "png", "gif");
 		fileChooser.setFileFilter(imageFilter);
 		fileChooser.setAccessory(new ImagePreview(fileChooser));
-		/*fileChooser.setFileView(new FileView(){
-            public Icon getIcon(File f)
-            {
-                return FileSystemView.getFileSystemView().getSystemIcon(f);
-            }
-        });*/
-		
 		//fileChooser.setFileView(new ImageFileView());
 		
 		this.setTitle("Furry Crossposter by Double Helix Industries - 1.1");

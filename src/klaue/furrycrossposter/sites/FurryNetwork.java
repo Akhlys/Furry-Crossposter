@@ -169,12 +169,14 @@ public class FurryNetwork extends Site {
 		form.findElement(By.className("submission-form__save")).click();
 		
 		// now we have the confirm message
-		WebElement confirmForm = driver.findElement(By.className("panel__content"));
-		boolean notificationCheckboxSelected = confirmForm.findElement(By.id("publish")).isSelected();
-		if (notificationCheckboxSelected && imageInfo.hasNoNotification()) {
-			confirmForm.findElement(By.className("checkbox-input__label")).click();
+		if (!imageInfo.isUnlisted()) {
+			WebElement confirmForm = driver.findElement(By.className("panel__content"));
+			boolean notificationCheckboxSelected = confirmForm.findElement(By.id("publish")).isSelected();
+			if (notificationCheckboxSelected && imageInfo.hasNoNotification()) {
+				confirmForm.findElement(By.className("checkbox-input__label")).click();
+			}
+			confirmForm.findElement(By.className("button--action--create")).click();
 		}
-		//confirmForm.findElement(By.className("button--action--create")).click();
 		
 		// open correct end url
 		// TODO: timeout or else the confirm dialog will not be correctly submitted

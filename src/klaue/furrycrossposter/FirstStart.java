@@ -37,6 +37,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.w3c.dom.Document;
@@ -118,7 +119,10 @@ public class FirstStart extends JDialog implements WindowListener {
 				options.addArguments("--no-sandbox");
 				DesiredCapabilities desiredCapabilities = DesiredCapabilities.chrome();
 				desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, options);
-				WebDriver webDriver = new ChromeDriver(desiredCapabilities);
+				if (FurryCrossposter.driverSVC == null) {
+					FurryCrossposter.driverSVC = ChromeDriverService.createDefaultService();
+				}
+				WebDriver webDriver = new ChromeDriver(FurryCrossposter.driverSVC,desiredCapabilities);
 				webDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 				webDriver.get("https://www.google.com");
 				((JavascriptExecutor)webDriver).executeScript("alert('Furry Crossposter - chrome profile set up');");

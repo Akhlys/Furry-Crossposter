@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -74,11 +75,11 @@ public abstract class Site {
 	 */
 	public abstract ArrayList<String> getErrorReasons(ImageInfo imageInfo);
 	
-	protected WebDriver getDriver(){
+	protected WebDriver getDriver() {
 		return getDriver(DesiredCapabilities.chrome());
 	}
 	
-	protected WebDriver getDriver(DesiredCapabilities desiredCapabilities) {
+	protected WebDriver getDriver(DesiredCapabilities desiredCapabilities){
 		if (FurryCrossposter.chromeProfile != null) {
 			ChromeOptions options = new ChromeOptions();
 			String profileDir = FurryCrossposter.chromeProfile.getParent().toString().replace("\\", "/");
@@ -88,7 +89,10 @@ public abstract class Site {
 			options.addArguments("--no-sandbox");
 			desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, options);
 		}
-		WebDriver driver = new ChromeDriver(desiredCapabilities);
+		if (FurryCrossposter.driverSVC == null) {
+			FurryCrossposter.driverSVC = ChromeDriverService.createDefaultService();
+		}
+		WebDriver driver = new ChromeDriver(FurryCrossposter.driverSVC,desiredCapabilities);
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 		return driver;
 	}

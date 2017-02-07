@@ -533,6 +533,12 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		}
 		int caretPosition = pane.getCaretPosition();
 		
+		// if a selection, remove selection from text and set caret to start of selection
+		if (pane.getSelectionStart() != pane.getSelectionEnd()) {
+			caretPosition = pane.getSelectionStart();
+			text = text.substring(0, caretPosition) + text.substring(pane.getSelectionEnd());
+		}
+		
 		if (text.length() > 100) {
 			// too long, make shorter
 			text = text.substring(0, 100);

@@ -131,7 +131,7 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		fileChooser.setAccessory(new ImagePreview(fileChooser));
 		//fileChooser.setFileView(new ImageFileView());
 		
-		this.setTitle("Furry Crossposter by Double Helix Industries - 1.1");
+		this.setTitle("Furry Crossposter by Double Helix Industries - 1.2");
 		this.setSize(900, 768);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JDialog.EXIT_ON_CLOSE);
@@ -542,6 +542,12 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 			return;
 		}
 		int caretPosition = pane.getCaretPosition();
+		
+		// if a selection, remove selection from text and set caret to start of selection
+		if (pane.getSelectionStart() != pane.getSelectionEnd()) {
+			caretPosition = pane.getSelectionStart();
+			text = text.substring(0, caretPosition) + text.substring(pane.getSelectionEnd());
+		}
 		
 		if (text.length() > 100) {
 			// too long, make shorter

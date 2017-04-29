@@ -69,14 +69,14 @@ public class Weasyl extends Site {
 		if (imageInfo.getSexualRating() == RatingSexual.NONE && imageInfo.getViolenceRating() == RatingViolence.NONE) {
 			rating.selectByValue("10"); // general
 		} else if (imageInfo.getSexualRating() == RatingSexual.NONE && imageInfo.getViolenceRating() != RatingViolence.VIOLENCE_EX) {
-			// sex not, violence moderate. weasyl counts even bare breasts as explicit, so better play it safe and make every
-			// sexual thing explicit
+			// sex not, violence moderate. weasyl counts any nudity as mature, so better play it safe and make every
+			// sexual thing at least mature
 			rating.selectByValue("20"); // Moderate (13+)
-		} else if(imageInfo.getSexualRating() == RatingSexual.NONE) {
-			// violence ex, but nudity not
+		} else if(imageInfo.getSexualRating() != RatingSexual.NUDITY_EX) {
+			// explicit violence and/or moderate nudity
 			rating.selectByValue("30"); // Mature (18+ non-sexual)
 		} else {
-			// nudity ex or mod, violence maybe too
+			// nudity explicit, violence maybe too
 			rating.selectByValue("40"); // Explicit (18+ sexual)
 		}
 		
@@ -227,7 +227,7 @@ public class Weasyl extends Site {
 		boolean containsIntersex = false;
 		for (Gender gender : imageInfo.getGenders()) {
 			tags.append(gender.getTag()).append(" ");
-			if (!containsIntersex) containsIntersex = !(gender.equals(Gender.M2F) || gender.equals(Gender.F2M) || gender.equals(Gender.MALE) || gender.equals(Gender.FEMALE));
+			if (!containsIntersex) containsIntersex = !(gender.equals(Gender.M2F) || gender.equals(Gender.F2M) || gender.equals(Gender.MALE) || gender.equals(Gender.FEMALE) || gender.equals(Gender.AMBIGUOUS));
 		}
 		if (containsIntersex) tags.append("intersex ");	
 		

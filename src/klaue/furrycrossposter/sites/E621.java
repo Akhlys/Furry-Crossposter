@@ -143,7 +143,7 @@ public class E621 extends Site {
 		boolean containsIntersex = false;
 		for (Gender gender : imageInfo.getGenders()) {
 			tags.add(gender.getTag());
-			if (!containsIntersex) containsIntersex = !(gender.equals(Gender.M2F) || gender.equals(Gender.F2M) || gender.equals(Gender.MALE) || gender.equals(Gender.FEMALE));
+			if (!containsIntersex) containsIntersex = !(gender.equals(Gender.M2F) || gender.equals(Gender.F2M) || gender.equals(Gender.MALE) || gender.equals(Gender.FEMALE) || gender.equals(Gender.AMBIGUOUS));
 		}
 		if (containsIntersex) tags.add("intersex");	
 		

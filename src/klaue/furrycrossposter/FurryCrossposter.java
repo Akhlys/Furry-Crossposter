@@ -15,6 +15,9 @@ import java.util.TreeSet;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+
+import org.openqa.selenium.chrome.ChromeDriverService;
 
 /**
  * the main and start class of furry crossposter
@@ -26,11 +29,19 @@ public class FurryCrossposter extends JFrame {
 	public static Path workingDir = Paths.get(System.getProperty("user.home") + "/.FurryCrossposter/");
 	public static Path chromeProfile = null;
 	public static TreeMap<String, Tag> tags = null;
+	public static ChromeDriverService driverSVC = null;
 	
 	/**
 	 * sets up furry crossposter
 	 */
 	public FurryCrossposter() {
+	    try {
+	        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	    }
+	    catch(Exception ex) {
+	        ex.printStackTrace();
+	    }
+		
 		final SplashScreen splash = new SplashScreen();
 		
 		new Thread(splash).start();

@@ -85,7 +85,7 @@ public abstract class Site {
 			String profileDir = FurryCrossposter.chromeProfile.getParent().toString().replace("\\", "/");
 			options.addArguments("user-data-dir=" + profileDir);
 			options.addArguments("profile-directory=" + FurryCrossposter.chromeProfile.getFileName().toString());
-			options.addArguments("--start-maximized");
+			//options.addArguments("--start-maximized");
 			options.addArguments("--no-sandbox");
 			desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, options);
 		}

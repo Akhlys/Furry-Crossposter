@@ -123,7 +123,7 @@ public class InkBunny extends Site {
 			boolean containsTrans = false;
 			for (Gender gender : imageInfo.getGenders()) {
 				genders.append(gender.getTag()).append(" ");
-				if (!containsIntersex) containsIntersex = !(gender.equals(Gender.M2F) || gender.equals(Gender.F2M) || gender.equals(Gender.MALE) || gender.equals(Gender.FEMALE));
+				if (!containsIntersex) containsIntersex = !(gender.equals(Gender.M2F) || gender.equals(Gender.F2M) || gender.equals(Gender.MALE) || gender.equals(Gender.FEMALE) || gender.equals(Gender.AMBIGUOUS));
 				if (!containsTrans) containsTrans = (gender.equals(Gender.M2F) || gender.equals(Gender.F2M));
 			}
 			genders.deleteCharAt(genders.length() - 1);

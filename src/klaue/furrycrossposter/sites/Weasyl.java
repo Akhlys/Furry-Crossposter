@@ -227,7 +227,7 @@ public class Weasyl extends Site {
 		boolean containsIntersex = false;
 		for (Gender gender : imageInfo.getGenders()) {
 			tags.append(gender.getTag()).append(" ");
-			if (!containsIntersex) containsIntersex = !(gender.equals(Gender.M2F) || gender.equals(Gender.F2M) || gender.equals(Gender.MALE) || gender.equals(Gender.FEMALE));
+			if (!containsIntersex) containsIntersex = !(gender.equals(Gender.M2F) || gender.equals(Gender.F2M) || gender.equals(Gender.MALE) || gender.equals(Gender.FEMALE) || gender.equals(Gender.AMBIGUOUS));
 		}
 		if (containsIntersex) tags.append("intersex ");	
 		

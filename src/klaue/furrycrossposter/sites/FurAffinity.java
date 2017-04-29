@@ -177,6 +177,8 @@ public class FurAffinity extends Site {
 		} else {
 			Gender gender = imageInfo.getGenders().first();
 			switch(gender) {
+				case AMBIGUOUS:
+					genderList.selectByValue("0");
 				case MALE:
 					genderList.selectByValue("2");
 					break;

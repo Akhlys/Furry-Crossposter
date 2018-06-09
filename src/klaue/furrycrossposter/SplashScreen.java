@@ -27,7 +27,7 @@ public class SplashScreen extends JWindow implements Runnable {
 	
 	public SplashScreen() {
 		try {
-			img = ImageIO.read(SplashScreen.class.getResourceAsStream("/splash.png"));
+			this.img = ImageIO.read(SplashScreen.class.getResourceAsStream("/splash.png"));
 			System.out.println("Splash image by Rainbow Boa - https://www.furaffinity.net/user/rainbow-boa/");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -36,33 +36,33 @@ public class SplashScreen extends JWindow implements Runnable {
 		
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice gd = ge.getDefaultScreenDevice();
-		isPerPixelTranslucencySupported = gd.isWindowTranslucencySupported(WindowTranslucency.PERPIXEL_TRANSLUCENT);
-		if (isPerPixelTranslucencySupported) {
+		this.isPerPixelTranslucencySupported = gd.isWindowTranslucencySupported(WindowTranslucency.PERPIXEL_TRANSLUCENT);
+		if (this.isPerPixelTranslucencySupported) {
 	        setBackground(new Color(0, 255, 0, 0));
 		}
 		
-		panel = new SplashPanel(isPerPixelTranslucencySupported, img);
-		add(panel);
+		this.panel = new SplashPanel(this.isPerPixelTranslucencySupported, this.img);
+		add(this.panel);
         pack();
-		setSize(img.getWidth(), img.getHeight()); 
+		setSize(this.img.getWidth(), this.img.getHeight()); 
         setLocationRelativeTo(null);
         //setAlwaysOnTop(true);
 	}
 
 	@Override
 	public void run() {
-		if (img != null) {
+		if (this.img != null) {
 			setVisible(true);
 		}
 	}
 	
 	public void fadeOut(int fadeSteps, int delay) throws InterruptedException {
-		float step = panel.getPaintTransparency() / fadeSteps;
+		float step = this.panel.getPaintTransparency() / fadeSteps;
 
 		// stop one shy of finish, as float is not designed to be accurate and it could actually result in a value below
 		// 0.9f - 0.1f = 0.79999995 XD
 		for (int i = 0; i < fadeSteps - 1; ++i) {
-			panel.setPaintTransparency(panel.getPaintTransparency() - step);
+			this.panel.setPaintTransparency(this.panel.getPaintTransparency() - step);
 			//SwingUtilities.getWindowAncestor( this ).repaint();
 			//this.revalidate();
 			this.repaint();
@@ -71,7 +71,7 @@ public class SplashScreen extends JWindow implements Runnable {
 	}
 	
 	public void stop() {
-		if (img != null && this.isVisible()) {
+		if (this.img != null && this.isVisible()) {
 			// it looks nicer when it stays just a bit longer
 //			try {
 //				if (isPerPixelTranslucencySupported) {
@@ -105,18 +105,18 @@ class SplashPanel extends JPanel {
 	
 	@Override
 	protected void paintComponent(Graphics g) {
-		if (img == null) return;
+		if (this.img == null) return;
 		super.paintComponent(g);
 		
 		if (g instanceof Graphics2D) {
 			Graphics2D g2d = (Graphics2D)g;
-			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, paintTransparency));
+			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, this.paintTransparency));
 		}
-		g.drawImage(img, 0, 0, null);
+		g.drawImage(this.img, 0, 0, null);
 	}
 
 	public float getPaintTransparency() {
-		return paintTransparency;
+		return this.paintTransparency;
 	}
 
 	public void setPaintTransparency(float paintTransparency) {

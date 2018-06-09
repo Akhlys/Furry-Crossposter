@@ -50,29 +50,29 @@ public class FurryNetwork extends Site {
 		}
 		// try..finally block to ensure file is deleted, as java NIO has no easy delete-on-exit method
 		try {
-			driver = getDriver();
+			this.driver = getDriver();
 			
-			driver.get("https://beta.furrynetwork.com/login/");
+			this.driver.get("https://beta.furrynetwork.com/login/");
 			
 			// wait for login
-			WebDriverWait wait = new WebDriverWait(driver, 60);
+			WebDriverWait wait = new WebDriverWait(this.driver, 60);
 			wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("user-nav__button-menu__trigger")));
 			
 	//		driver.findElement(By.cssSelector("button.user-nav__click-icon.onclick")).click();
 	//		driver.findElement(By.xpath("//a[@href='/submissions']")).click();
 	//		
 	//		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
-			driver.get("https://beta.furrynetwork.com/submissions");
-			driver.findElement(By.xpath("//a[@href='/submissions/artwork/draft/']")).click();
+			this.driver.get("https://beta.furrynetwork.com/submissions");
+			this.driver.findElement(By.xpath("//a[@href='/submissions/artwork/draft/']")).click();
 			
 			//driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 			
 			// this is a bit of a hack. the dropper of FN uses a hidden field as drop target, somehow, search it's app.js for
 			// "dropper" and the input with display = 'none' it generates
 			// since it is hidden, we can't send stuff directly to it. but we can make it visible and then upload.
-			WebElement hiddenField = driver.findElement(By.xpath(".//div[contains(@class, 'submission-uploader__dropper')]/input"));
-			if (driver instanceof JavascriptExecutor) {
-			    ((JavascriptExecutor)driver).executeScript("arguments[0].style.display = 'block';", hiddenField);
+			WebElement hiddenField = this.driver.findElement(By.xpath(".//div[contains(@class, 'submission-uploader__dropper')]/input"));
+			if (this.driver instanceof JavascriptExecutor) {
+			    ((JavascriptExecutor)this.driver).executeScript("arguments[0].style.display = 'block';", hiddenField);
 			} else {
 				// the normal driver we use can use JS, but let's be sure
 			    throw new IllegalStateException("This driver does not support JavaScript!");
@@ -86,9 +86,9 @@ public class FurryNetwork extends Site {
 			// uploading: <img class="thumbnail__img" src="/1e38971a7f090c817cc7abdd9312e828.jpg" alt="bigfile" data-reactid=".0.2.0.1.0.0.0.0.$submission-0.0.0.0.0">
 			// uploaded:  <img class="thumbnail__img" src="https://d3gz42uwgl1r1y.cloudfront.net/kl/klaue/submission/2016/05/d2632e127759dddbc7f22a7a264ed677/315x315.jpg" alt="bigfile" data-reactid=".0.2.0.1.0.0.0.0.$submission-0.0.0.0.0">
 			// TODO: find a less hacky way
-			driver.findElement(By.xpath("//img[@alt='" + pseudoTitle + "' and contains(@src, 'cloudfront.net')]/..")).click();
+			this.driver.findElement(By.xpath("//img[@alt='" + pseudoTitle + "' and contains(@src, 'cloudfront.net')]/..")).click();
 			
-			WebElement form = driver.findElement(By.xpath(".//form[contains(@class, 'submission-form')]"));
+			WebElement form = this.driver.findElement(By.xpath(".//form[contains(@class, 'submission-form')]"));
 			
 			if (!imageInfo.getTitle().isEmpty()) {
 				// selecting first, clearing wont work if not
@@ -122,7 +122,7 @@ public class FurryNetwork extends Site {
 			
 			
 			// folders - find folder list
-			WebElement colList = driver.findElement(By.className("edit-collections__list"));
+			WebElement colList = this.driver.findElement(By.className("edit-collections__list"));
 			List<WebElement> colElements = colList.findElements(By.className("edit-collections__list__item__name"));
 			ArrayList<String> foldersToAdd = new ArrayList<>();
 			for (WebElement colElement : colElements) {
@@ -162,7 +162,7 @@ public class FurryNetwork extends Site {
 			form.findElement(By.className("submission-form__save")).click();
 			
 			// now we have the confirm message
-			WebElement confirmForm = driver.findElement(By.className("panel__content"));
+			WebElement confirmForm = this.driver.findElement(By.className("panel__content"));
 			boolean notificationCheckboxSelected = confirmForm.findElement(By.id("publish")).isSelected();
 			if (notificationCheckboxSelected && imageInfo.hasNoNotification()) {
 				confirmForm.findElement(By.className("checkbox-input__label")).click();
@@ -177,7 +177,7 @@ public class FurryNetwork extends Site {
 	//			driver.get("https://beta.furrynetwork.com/submissions/artwork/public/");
 	//		}
 			
-			showFinishMessage(driver);
+			showFinishMessage(this.driver);
 		
 		} finally {
 			// delete temp file
@@ -195,7 +195,7 @@ public class FurryNetwork extends Site {
 
 	@Override
 	public ArrayList<String> getErrorReasons(ImageInfo imageInfo) {
-		ArrayList<String> reasons = new ArrayList<String>();
+		ArrayList<String> reasons = new ArrayList<>();
 
 		/*
 		 * main image
@@ -249,7 +249,7 @@ public class FurryNetwork extends Site {
 
 	@Override
 	public ArrayList<String> getWarningReasons(ImageInfo imageInfo) {
-		ArrayList<String> reasons = new ArrayList<String>();
+		ArrayList<String> reasons = new ArrayList<>();
 
 		reasons.add("type will be Artwork, not " + imageInfo.getType());
 

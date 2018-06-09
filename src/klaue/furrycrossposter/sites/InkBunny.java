@@ -73,47 +73,47 @@ public class InkBunny extends Site {
 			}
 		}
 		
-		driver = getDriver();
+		this.driver = getDriver();
 		
-		driver.get("https://inkbunny.net/login.php");
+		this.driver.get("https://inkbunny.net/login.php");
 		
 		// wait for login
-		WebDriverWait wait = new WebDriverWait(driver, 60);
+		WebDriverWait wait = new WebDriverWait(this.driver, 60);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("privatemessage_notification")));
 		
 		// go to upload (menu will only show on hover)
-		WebElement menu = driver.findElement(By.xpath("//div[@id='usernavigation']/div[4]/ul/li[2]"));
+		WebElement menu = this.driver.findElement(By.xpath("//div[@id='usernavigation']/div[4]/ul/li[2]"));
 		//build and perform the mouseOver with Advanced User Interactions API
-		Actions builder = new Actions(driver);
+		Actions builder = new Actions(this.driver);
 		builder.moveToElement(menu).build().perform();
-		driver.findElement(By.xpath("//div[@id='usernavigation']/div[4]/ul/li[2]/ul/li/a/span")).click();
+		this.driver.findElement(By.xpath("//div[@id='usernavigation']/div[4]/ul/li[2]/ul/li/a/span")).click();
 		
 		// upload image and thumb, wait for upload to complete, give it 2 mins
-		driver.findElement(By.name("uploadedfile[]")).sendKeys(imagePath.toString());
+		this.driver.findElement(By.name("uploadedfile[]")).sendKeys(imagePath.toString());
 		
 		if (thumbPath != null) {
-			driver.findElement(By.name("uploadedthumbnail[]")).sendKeys(thumbPath.toString());
+			this.driver.findElement(By.name("uploadedthumbnail[]")).sendKeys(thumbPath.toString());
 		}
-		driver.findElement(By.xpath("//input[@value='Upload']")).click();
-		wait = new WebDriverWait(driver, 120);
+		this.driver.findElement(By.xpath("//input[@value='Upload']")).click();
+		wait = new WebDriverWait(this.driver, 120);
 		WebElement elem = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@value='Next >']")));
 		elem.click();
 		
 		// image type, only change if sketch
 		if (imageInfo.getType() == ImageInfo.Type.SKETCH) {
-			new Select(driver.findElement(By.id("typeselector"))).selectByVisibleText("Sketch");
+			new Select(this.driver.findElement(By.id("typeselector"))).selectByVisibleText("Sketch");
 		}
 		
 		if (imageInfo.isToScraps()) {
-			driver.findElement(By.id("scraps")).click();
+			this.driver.findElement(By.id("scraps")).click();
 		}
 		
-		driver.findElement(By.name("title")).clear();
-		driver.findElement(By.name("title")).sendKeys(imageInfo.getTitle());
+		this.driver.findElement(By.name("title")).clear();
+		this.driver.findElement(By.name("title")).sendKeys(imageInfo.getTitle());
 		
 		if (!imageInfo.getDescription().trim().isEmpty()) {
-			driver.findElement(By.id("desc")).clear();
-			driver.findElement(By.id("desc")).sendKeys(imageInfo.getDescription());
+			this.driver.findElement(By.id("desc")).clear();
+			this.driver.findElement(By.id("desc")).sendKeys(imageInfo.getDescription());
 		}
 		
 		// gender
@@ -130,9 +130,9 @@ public class InkBunny extends Site {
 			if (containsIntersex) genders.append(" intersex");	
 			if (containsTrans) genders.append(" gender_transformation");			
 
-			driver.findElement(By.id("keywords_sexgender")).sendKeys(genders.toString());
+			this.driver.findElement(By.id("keywords_sexgender")).sendKeys(genders.toString());
 		} else {
-			driver.findElement(By.id("keywords_sexgender_na")).click();
+			this.driver.findElement(By.id("keywords_sexgender_na")).click();
 		}
 		
 		// species
@@ -142,9 +142,9 @@ public class InkBunny extends Site {
 				animals.append(species).append(" ");
 			}
 			animals.deleteCharAt(animals.length() - 1);
-			driver.findElement(By.id("keywords_species")).sendKeys(animals.toString());
+			this.driver.findElement(By.id("keywords_species")).sendKeys(animals.toString());
 		} else {
-			driver.findElement(By.id("keywords_species_na")).click();
+			this.driver.findElement(By.id("keywords_species_na")).click();
 		}
 
 		// themes
@@ -154,9 +154,9 @@ public class InkBunny extends Site {
 				kinks.append(kink).append(" ");
 			}
 			kinks.deleteCharAt(kinks.length() - 1);
-			driver.findElement(By.id("keywords_themes")).sendKeys(kinks.toString());
+			this.driver.findElement(By.id("keywords_themes")).sendKeys(kinks.toString());
 		} else {
-			driver.findElement(By.id("keywords_themes_na")).click();
+			this.driver.findElement(By.id("keywords_themes_na")).click();
 		}
 
 		// others
@@ -166,46 +166,46 @@ public class InkBunny extends Site {
 				others.append(other).append(" ");
 			}
 			others.deleteCharAt(others.length() - 1);
-			driver.findElement(By.id("keywords_other")).sendKeys(others.toString());
+			this.driver.findElement(By.id("keywords_other")).sendKeys(others.toString());
 		}
 		
 		// rating
 		if (imageInfo.getSexualRating() == RatingSexual.NONE && imageInfo.getViolenceRating() == RatingViolence.NONE) {
-			driver.findElement(By.id("general_norating")).click();
+			this.driver.findElement(By.id("general_norating")).click();
 		} else {
 			if (imageInfo.getSexualRating() == RatingSexual.NUDITY_MOD) {
-				driver.findElement(By.id("ct_2")).click();
+				this.driver.findElement(By.id("ct_2")).click();
 			} else if (imageInfo.getSexualRating() == RatingSexual.NUDITY_EX) {
-				driver.findElement(By.id("ct_4")).click();
+				this.driver.findElement(By.id("ct_4")).click();
 			}
 			
 			if (imageInfo.getViolenceRating() == RatingViolence.VIOLENCE_MOD) {
-				driver.findElement(By.id("ct_3")).click();
+				this.driver.findElement(By.id("ct_3")).click();
 			} else if (imageInfo.getViolenceRating() == RatingViolence.VIOLENCE_EX) {
-				driver.findElement(By.id("ct_5")).click();
+				this.driver.findElement(By.id("ct_5")).click();
 			}
 		}
 		
 		if (imageInfo.getFolders().size() > 0) {
-			driver.findElement(By.id("pools")).click();
+			this.driver.findElement(By.id("pools")).click();
 		}
 		
 		if (imageInfo.isFriendsOnly()) {
-			driver.findElement(By.id("friends_only")).click();
+			this.driver.findElement(By.id("friends_only")).click();
 		}
 		
 		if (imageInfo.isUnlisted()) {
-			new Select(driver.findElement(By.name("visibility"))).selectByValue("no");
+			new Select(this.driver.findElement(By.name("visibility"))).selectByValue("no");
 		} else if(imageInfo.hasNoNotification()) {
-			new Select(driver.findElement(By.name("visibility"))).selectByValue("yes_nowatch");
+			new Select(this.driver.findElement(By.name("visibility"))).selectByValue("yes_nowatch");
 		}
 		
-		driver.findElement(By.xpath("//input[@value='Next >']")).click();
+		this.driver.findElement(By.xpath("//input[@value='Next >']")).click();
 		
 
 		if (imageInfo.getFolders().size() > 0) {
 			// we selected the pool button, so now we're at pool choosing
-			List<WebElement> poolLinks = driver.findElements(By.xpath("//a[contains(@href, 'poolview_process.php?pool_id=')]"));
+			List<WebElement> poolLinks = this.driver.findElements(By.xpath("//a[contains(@href, 'poolview_process.php?pool_id=')]"));
 			
 			//boolean poolFound = false;
 			for (WebElement element : poolLinks) {
@@ -215,14 +215,14 @@ public class InkBunny extends Site {
 					String href = element.getAttribute("href");
 					int start = href.indexOf("pool_id=") + 8;
 					String poolId = href.substring(start);
-					driver.findElement(By.xpath("//a[contains(@onclick, '" + poolId + "') and @title='Add to Pool']")).click();
+					this.driver.findElement(By.xpath("//a[contains(@onclick, '" + poolId + "') and @title='Add to Pool']")).click();
 				}
 			}
 			
-			driver.findElement(By.xpath("//input[@value='Done']")).click();
+			this.driver.findElement(By.xpath("//input[@value='Done']")).click();
 		}
 		
-		showFinishMessage(driver);
+		showFinishMessage(this.driver);
 		
 		// delete img/thumb if resized to working dir
 		try {
@@ -239,7 +239,7 @@ public class InkBunny extends Site {
 
 	@Override
 	public ArrayList<String> getErrorReasons(ImageInfo imageInfo) {
-		ArrayList<String> reasons = new ArrayList<String>();
+		ArrayList<String> reasons = new ArrayList<>();
 
 		/*
 		 * main image
@@ -313,7 +313,7 @@ public class InkBunny extends Site {
 		if (!foundCorrect) reasons.add("no species set");
 
 		foundCorrect = false;
-		ArrayList<String> cummulativeTags = new ArrayList<String>();
+		ArrayList<String> cummulativeTags = new ArrayList<>();
 		cummulativeTags.addAll(imageInfo.getKinkTags());
 		cummulativeTags.addAll(imageInfo.getOtherTags());
 		for (String other : cummulativeTags) {
@@ -337,7 +337,7 @@ public class InkBunny extends Site {
 
 	@Override
 	public ArrayList<String> getWarningReasons(ImageInfo imageInfo) {
-		ArrayList<String> reasons = new ArrayList<String>();
+		ArrayList<String> reasons = new ArrayList<>();
 
 		try {
 			BufferedImage image = ImageIO.read(imageInfo.getImagePath().toFile());

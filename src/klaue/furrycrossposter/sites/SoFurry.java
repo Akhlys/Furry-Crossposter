@@ -20,8 +20,6 @@ import klaue.furrycrossposter.ImageInfo.RatingViolence;
 
 public class SoFurry extends Site {
 	private WebDriver driver;
-	private String user = null;
-	private String password = null;
 	Path sofurryPropertiesPath = FurryCrossposter.workingDir.resolve("sofurry.properties");
 	
 	@Override
@@ -32,31 +30,31 @@ public class SoFurry extends Site {
 		Path thumbPath = imageInfo.getThumbPath();
 		
 		
-		driver = getDriver();
+		this.driver = getDriver();
 		
-		driver.get("https://www.sofurry.com/user/login");
+		this.driver.get("https://www.sofurry.com/user/login");
 		
 		// wait for login
-		WebDriverWait wait = new WebDriverWait(driver, 60);
+		WebDriverWait wait = new WebDriverWait(this.driver, 60);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@href='/upload']")));
 		
-		driver.get("https://www.sofurry.com/upload/details?contentType=1");
+		this.driver.get("https://www.sofurry.com/upload/details?contentType=1");
 		
-		driver.findElement(By.id("UploadForm_P_title")).sendKeys(imageInfo.getTitle());
+		this.driver.findElement(By.id("UploadForm_P_title")).sendKeys(imageInfo.getTitle());
 		
-		driver.findElement(By.id("UploadForm_binarycontent")).sendKeys(imagePath.toString());
+		this.driver.findElement(By.id("UploadForm_binarycontent")).sendKeys(imagePath.toString());
 		
 		// upload dialog progress thingy
-		wait.until(ExpectedConditions.invisibilityOfAllElements(driver.findElements(By.className("ui-dialog"))));
+		wait.until(ExpectedConditions.invisibilityOfAllElements(this.driver.findElements(By.className("ui-dialog"))));
 		
 		if (thumbPath != null) {
-			driver.findElement(By.id("UploadForm_binarycontent_5")).sendKeys(thumbPath.toString());
+			this.driver.findElement(By.id("UploadForm_binarycontent_5")).sendKeys(thumbPath.toString());
 			// upload dialog progress thingy
-			wait.until(ExpectedConditions.invisibilityOfAllElements(driver.findElements(By.className("ui-dialog"))));
+			wait.until(ExpectedConditions.invisibilityOfAllElements(this.driver.findElements(By.className("ui-dialog"))));
 		}
 		
 		// folder
-		Select folderSelect = new Select(driver.findElement(By.id("UploadForm_folderId")));
+		Select folderSelect = new Select(this.driver.findElement(By.id("UploadForm_folderId")));
 		for (WebElement option : folderSelect.getOptions()) {
 			if (imageInfo.getFolders().contains(option.getText().trim().toLowerCase().replace(" ", "_"))) {
 				folderSelect.selectByVisibleText(option.getText());
@@ -70,19 +68,19 @@ public class SoFurry extends Site {
 			//driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_0']/../span")).click();
 			// forcing it to be clicked through js as above way stopped to work for some reason
 			//TODO: why tho? makes no sense
-			((JavascriptExecutor)driver).executeScript("arguments[0].click()", driver.findElement(By.id("UploadForm_contentLevel_0")));
+			((JavascriptExecutor)this.driver).executeScript("arguments[0].click()", this.driver.findElement(By.id("UploadForm_contentLevel_0")));
 		} else {
 			// check just for cub here, rest the user can choose himself afterwards but cub could bring drama
 			if (getTags(imageInfo).trim().matches("^(.*, )*cub(, .*)*$")) {
 				//driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_2']/../span")).click();
 				// forcing it to be clicked through js as above way stopped to work for some reason
 				//TODO: why tho? makes no sense
-				((JavascriptExecutor)driver).executeScript("arguments[0].click()", driver.findElement(By.id("UploadForm_contentLevel_2")));
+				((JavascriptExecutor)this.driver).executeScript("arguments[0].click()", this.driver.findElement(By.id("UploadForm_contentLevel_2")));
 			} else {
 				//driver.findElement(By.xpath("//input[@id='UploadForm_contentLevel_1']/../span")).click();
 				// forcing it to be clicked through js as above way stopped to work for some reason
 				//TODO: why tho? makes no sense
-				((JavascriptExecutor)driver).executeScript("arguments[0].click()", driver.findElement(By.id("UploadForm_contentLevel_1")));
+				((JavascriptExecutor)this.driver).executeScript("arguments[0].click()", this.driver.findElement(By.id("UploadForm_contentLevel_1")));
 			}
 		}
 		
@@ -90,32 +88,32 @@ public class SoFurry extends Site {
 			//driver.findElement(By.xpath("//input[@id='UploadForm_P_hidePublic_3']/../span")).click();
 			// forcing it to be clicked through js as above way stopped to work for some reason
 			//TODO: why tho? makes no sense
-			((JavascriptExecutor)driver).executeScript("arguments[0].click()", driver.findElement(By.id("UploadForm_P_hidePublic_3")));
+			((JavascriptExecutor)this.driver).executeScript("arguments[0].click()", this.driver.findElement(By.id("UploadForm_P_hidePublic_3")));
 		} else if (imageInfo.isFriendsOnly()) {
 			//driver.findElement(By.xpath("//input[@id='UploadForm_P_hidePublic_2']/../span")).click();
 			// forcing it to be clicked through js as above way stopped to work for some reason
 			//TODO: why tho? makes no sense
-			((JavascriptExecutor)driver).executeScript("arguments[0].click()", driver.findElement(By.id("UploadForm_P_hidePublic_2")));
+			((JavascriptExecutor)this.driver).executeScript("arguments[0].click()", this.driver.findElement(By.id("UploadForm_P_hidePublic_2")));
 		} else {
 			//driver.findElement(By.xpath("//input[@id='UploadForm_P_hidePublic_0']/../span")).click();
 			// forcing it to be clicked through js as above way stopped to work for some reason
 			//TODO: why tho? makes no sense
-			((JavascriptExecutor)driver).executeScript("arguments[0].click()", driver.findElement(By.id("UploadForm_P_hidePublic_0")));
+			((JavascriptExecutor)this.driver).executeScript("arguments[0].click()", this.driver.findElement(By.id("UploadForm_P_hidePublic_0")));
 		}
 		
 		if (!imageInfo.getDescription().isEmpty()) {
-			driver.findElement(By.id("UploadForm_description")).sendKeys(imageInfo.getDescription());
+			this.driver.findElement(By.id("UploadForm_description")).sendKeys(imageInfo.getDescription());
 		}
 		
 		String tags = getTags(imageInfo);
-		driver.findElement(By.id("sf-upload-tags")).sendKeys(tags);
+		this.driver.findElement(By.id("sf-upload-tags")).sendKeys(tags);
 		
 		//driver.findElement(By.className("bigsubmit")).click();
 		// forcing it to be clicked through js as above way stopped to work for some reason
 		//TODO: why tho? makes no sense
-		((JavascriptExecutor)driver).executeScript("arguments[0].click()", driver.findElement(By.className("bigsubmit")));
+		((JavascriptExecutor)this.driver).executeScript("arguments[0].click()", this.driver.findElement(By.className("bigsubmit")));
 		
-		showFinishMessage(driver);
+		showFinishMessage(this.driver);
 		
 		//driver.quit();
 		return true;
@@ -123,7 +121,7 @@ public class SoFurry extends Site {
 
 	@Override
 	public ArrayList<String> getErrorReasons(ImageInfo imageInfo) {
-		ArrayList<String> reasons = new ArrayList<String>();
+		ArrayList<String> reasons = new ArrayList<>();
 
 		/*
 		 * main image
@@ -173,7 +171,7 @@ public class SoFurry extends Site {
 
 	@Override
 	public ArrayList<String> getWarningReasons(ImageInfo imageInfo) {
-		ArrayList<String> reasons = new ArrayList<String>();
+		ArrayList<String> reasons = new ArrayList<>();
 
 		reasons.add("no type support, all types will result in same");
 		

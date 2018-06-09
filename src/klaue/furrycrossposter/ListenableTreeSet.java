@@ -9,7 +9,7 @@ import javax.swing.event.ChangeListener;
 
 public class ListenableTreeSet<T> extends TreeSet<T> {
 	private static final long serialVersionUID = -3486305602551487237L;
-	private ArrayList<ChangeListener> listeners = new ArrayList<ChangeListener>();
+	private ArrayList<ChangeListener> listeners = new ArrayList<>();
 	
 
 	public void addChangeListener(ChangeListener c) {
@@ -22,7 +22,7 @@ public class ListenableTreeSet<T> extends TreeSet<T> {
 	
 	private void fireChangeEvent() {
 		ChangeEvent e = new ChangeEvent(this);
-		for (ChangeListener listener : listeners) {
+		for (ChangeListener listener : this.listeners) {
 			listener.stateChanged(e);
 		}
 	}

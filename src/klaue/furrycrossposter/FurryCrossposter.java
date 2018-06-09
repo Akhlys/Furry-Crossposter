@@ -81,7 +81,7 @@ public class FurryCrossposter extends JFrame {
 			new FirstStart(workingDir);
 		}
 		
-		TreeSet<Tag> tagsSet = new TreeSet<Tag>();
+		TreeSet<Tag> tagsSet = new TreeSet<>();
 		try (FileInputStream fis = new FileInputStream(workingDir.resolve("tags").toString())) {
 			try (ObjectInputStream ois = new ObjectInputStream(fis)) {
 				tagsSet = (TreeSet<Tag>)ois.readObject();
@@ -93,7 +93,7 @@ public class FurryCrossposter extends JFrame {
 		}
 		
 		// reform to map for easier searching
-		FurryCrossposter.tags = new TreeMap<String, Tag>();
+		FurryCrossposter.tags = new TreeMap<>();
 		for (Tag tag : tagsSet) {
 			FurryCrossposter.tags.put(tag.getName(), tag);
 		}

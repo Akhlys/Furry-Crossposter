@@ -30,6 +30,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,7 +39,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -52,27 +52,27 @@ import org.xml.sax.SAXException;
  */
 public class FirstStart extends JDialog implements WindowListener {
 	private static final long serialVersionUID = 1L;
-	private Path workingDirectory = null;
+	Path workingDirectory = null;
 	
-	private File chromeProfileDir = null;
-	private TreeSet<Tag> imageTags = new TreeSet<Tag>();
-	private boolean imageTagsDownloading = false;
+	File chromeProfileDir = null;
+	TreeSet<Tag> imageTags = new TreeSet<>();
+	boolean imageTagsDownloading = false;
 	private JButton closeButton = new JButton("Finished!");
-	private boolean saved = false;
+	boolean saved = false;
 	
 	public static int MIN_TAGCOUNT = 10;
 	
 	public FirstStart(Path p) {
-		workingDirectory = p;
+		this.workingDirectory = p;
 		
 		this.setTitle("Furry Crossposter - First Start");
 		this.setSize(700, 600);
 		this.setLocationRelativeTo(null);
-		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(this);
 		this.setModal(true);
 		
-		closeButton.setEnabled(false);
+		this.closeButton.setEnabled(false);
 		
 		JPanel mainPanel = new JPanel();
 		mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -101,7 +101,7 @@ public class FirstStart extends JDialog implements WindowListener {
 		genProfile.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				Path chromeProfilePath = workingDirectory.resolve("chrome").resolve("furry_crossposter_profile");
+				Path chromeProfilePath = FirstStart.this.workingDirectory.resolve("chrome").resolve("furry_crossposter_profile");
 				try {
 					Files.createDirectories(chromeProfilePath);
 				} catch (IOException e) {
@@ -121,7 +121,7 @@ public class FirstStart extends JDialog implements WindowListener {
 				((JavascriptExecutor)webDriver).executeScript("alert('Furry Crossposter - chrome profile set up');");
 				
 				profileName.setText(chromeProfilePath.getFileName().toString());
-				chromeProfileDir = chromeProfilePath.toFile();
+				FirstStart.this.chromeProfileDir = chromeProfilePath.toFile();
 			}
 		});
 		pnlSelProfile.add(genProfile);
@@ -147,7 +147,7 @@ public class FirstStart extends JDialog implements WindowListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				downloadTags.setEnabled(false);
-				imageTagsDownloading = true;
+				FirstStart.this.imageTagsDownloading = true;
 				//downloadTags
 				new Thread(new Runnable() {
 					@Override
@@ -157,8 +157,8 @@ public class FirstStart extends JDialog implements WindowListener {
 							for (int i = 1; i <= 100; ++i) {
 								downloadTags.setText("Downloading page " + i + ", please wait..");
 								System.out.println("Downloading page " + i);
-								ArrayList<Tag> tags = downloadTag(i, workingDirectory);
-								imageTags.addAll(tags);
+								ArrayList<Tag> tags = downloadTag(i, FirstStart.this.workingDirectory);
+								FirstStart.this.imageTags.addAll(tags);
 								if (tags.get(tags.size() - 1).getCount() < MIN_TAGCOUNT) {
 									// it doesn't matter if the current list of tags contains some with less than 10
 									break;
@@ -174,13 +174,13 @@ public class FirstStart extends JDialog implements WindowListener {
 							JOptionPane.showMessageDialog(null, "Could not download tags, " + e.getMessage(), "FurryCrossposter", JOptionPane.ERROR_MESSAGE);
 						}
 						
-						imageTagsDownloading = false;
+						FirstStart.this.imageTagsDownloading = false;
 						if (!completedSuccessfully) {
-							imageTags.clear();
+							FirstStart.this.imageTags.clear();
 							downloadTags.setEnabled(true);
 							downloadTags.setText("Try again to download tags from e621.net");
 						} else {
-							downloadTags.setText("Downloaded " + imageTags.size() + " tags successfully! :D");
+							downloadTags.setText("Downloaded " + FirstStart.this.imageTags.size() + " tags successfully! :D");
 							setCloseButton();
 						}
 					}
@@ -192,19 +192,19 @@ public class FirstStart extends JDialog implements WindowListener {
 		mainPanel.add(Box.createVerticalStrut(10));
 		
 
-		closeButton.addActionListener(new ActionListener() {
+		this.closeButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (imageTags.size() == 0 || (chromeProfileDir != null && (!chromeProfileDir.exists() || !chromeProfileDir.isDirectory()))) return;
+				if (FirstStart.this.imageTags.size() == 0 || (FirstStart.this.chromeProfileDir != null && (!FirstStart.this.chromeProfileDir.exists() || !FirstStart.this.chromeProfileDir.isDirectory()))) return;
 				
 				// save ff profile dir
 				Properties props = new Properties();
-				if (chromeProfileDir != null) {
-					props.setProperty("ProfileFolder", chromeProfileDir.getAbsolutePath());
+				if (FirstStart.this.chromeProfileDir != null) {
+					props.setProperty("ProfileFolder", FirstStart.this.chromeProfileDir.getAbsolutePath());
 				} else {
 					props.setProperty("ProfileFolder", "generic");
 				}
-		        File f = workingDirectory.resolve("FurryCrossposter.properties").toFile();
+		        File f = FirstStart.this.workingDirectory.resolve("FurryCrossposter.properties").toFile();
 		        if (f.exists()) f.delete();
 		        try (OutputStream out = new FileOutputStream(f)) {
 		        	props.store(out, "Furry Crossposter Settings");
@@ -215,11 +215,11 @@ public class FirstStart extends JDialog implements WindowListener {
 				}
 		        
 		        // save tags
-		        f = workingDirectory.resolve("tags").toFile();
+		        f = FirstStart.this.workingDirectory.resolve("tags").toFile();
 		        if (f.exists()) f.delete();
 		        try (OutputStream out = new FileOutputStream(f)) {
 		        	try (ObjectOutputStream oout = new ObjectOutputStream(out)) {
-		        		oout.writeObject(imageTags);
+		        		oout.writeObject(FirstStart.this.imageTags);
 		        	}
 		        } catch (IOException e) {
 		        	f.delete();
@@ -228,17 +228,17 @@ public class FirstStart extends JDialog implements WindowListener {
 					return;
 				}
 		        
-		        saved = true;
+		        FirstStart.this.saved = true;
 		        FirstStart.this.dispose();
 			}
 		});
 		mainPanel.add(Box.createVerticalGlue());
-		mainPanel.add(closeButton);
+		mainPanel.add(this.closeButton);
 		
 		this.setVisible(true);
 	}
 	
-	private ArrayList<Tag> downloadTag(int page, Path workingDir) throws ParserConfigurationException, SAXException, IOException {
+	ArrayList<Tag> downloadTag(int page, Path workingDir) throws ParserConfigurationException, SAXException, IOException {
 		Path xml = workingDir.resolve("tag.xml");
 		if (Files.exists(xml)) Files.delete(xml);
 		
@@ -246,9 +246,9 @@ public class FirstStart extends JDialog implements WindowListener {
 		URLConnection c = website.openConnection();
 		c.setRequestProperty("User-Agent", "FurryCrossposter");
 		ReadableByteChannel rbc = Channels.newChannel(c.getInputStream());
-		FileOutputStream fos = new FileOutputStream(xml.toString());
-		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-		fos.close();
+		try (FileOutputStream fos = new FileOutputStream(xml.toString())) {
+			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+		}
 	    
 	    // parse
   		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -257,7 +257,7 @@ public class FirstStart extends JDialog implements WindowListener {
   		Element docEle = dom.getDocumentElement();
   		NodeList nl = docEle.getElementsByTagName("tag");
   		
-  		ArrayList<Tag> tagList = new ArrayList<Tag>();
+  		ArrayList<Tag> tagList = new ArrayList<>();
   		if(nl != null && nl.getLength() > 0) {
 			for(int i = 0 ; i < nl.getLength();i++) {
 				Element tagEl = (Element)nl.item(i);
@@ -285,13 +285,13 @@ public class FirstStart extends JDialog implements WindowListener {
 		return tagList;
 	}
 	
-	private void setCloseButton() {
-		closeButton.setEnabled(imageTags.size() > 0 && !imageTagsDownloading && (chromeProfileDir == null || chromeProfileDir.exists()));
+	void setCloseButton() {
+		this.closeButton.setEnabled(this.imageTags.size() > 0 && !this.imageTagsDownloading && (this.chromeProfileDir == null || this.chromeProfileDir.exists()));
 	}
 
 	@Override
 	public void windowClosing(WindowEvent arg0) {
-		if (!saved) {
+		if (!this.saved) {
 			int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to abort? FurryCrossposter will exit.", "FurryCrossposter", JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
 				System.exit(ABORT);

@@ -28,16 +28,16 @@ public class E621 extends Site {
 		if (!canUpload(imageInfo)) return false;
 		Path imagePath = imageInfo.getImagePath();
 		
-		driver = getDriver();
+		this.driver = getDriver();
 		
-		driver.get("https://e621.net/user/login");
+		this.driver.get("https://e621.net/user/login");
 		
-		WebDriverWait wait = new WebDriverWait(driver, 60);
+		WebDriverWait wait = new WebDriverWait(this.driver, 60);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@href='/user/edit']")));
 		
-		driver.get("https://e621.net/post/upload");
+		this.driver.get("https://e621.net/post/upload");
 
-		driver.findElement(By.id("post_file")).sendKeys(imagePath.toString());
+		this.driver.findElement(By.id("post_file")).sendKeys(imagePath.toString());
 		
 		// tags
 		// tags were already tested to all be valid in getErrorReasons() so no need to check them again
@@ -48,8 +48,8 @@ public class E621 extends Site {
 		}
 		tagString.deleteCharAt(tagString.length() - 1);
 		
-		driver.findElement(By.id("post_tags")).clear();
-		driver.findElement(By.id("post_tags")).sendKeys(tagString.toString());
+		this.driver.findElement(By.id("post_tags")).clear();
+		this.driver.findElement(By.id("post_tags")).sendKeys(tagString.toString());
 		
 		// build description
 		StringBuffer description = new StringBuffer();
@@ -58,20 +58,20 @@ public class E621 extends Site {
 		}
 		description.append(imageInfo.getDescription());
 		
-		driver.findElement(By.id("post_description")).clear();
-		driver.findElement(By.id("post_description")).sendKeys(description.toString());
+		this.driver.findElement(By.id("post_description")).clear();
+		this.driver.findElement(By.id("post_description")).sendKeys(description.toString());
 		
 		if (imageInfo.getSexualRating() == RatingSexual.NUDITY_EX || imageInfo.getViolenceRating() == RatingViolence.VIOLENCE_EX) {
-			driver.findElement(By.id("post_rating_questionable")).click();
+			this.driver.findElement(By.id("post_rating_questionable")).click();
 		} else if (imageInfo.getSexualRating() == RatingSexual.NUDITY_MOD || imageInfo.getViolenceRating() == RatingViolence.VIOLENCE_MOD) {
-			driver.findElement(By.id("post_rating_questionable")).click();
+			this.driver.findElement(By.id("post_rating_questionable")).click();
 		} else {
-			driver.findElement(By.id("post_rating_safe")).click();
+			this.driver.findElement(By.id("post_rating_safe")).click();
 		}
 
-		driver.findElement(By.xpath("//input[@type='submit' and @value='Upload']")).click();
+		this.driver.findElement(By.xpath("//input[@type='submit' and @value='Upload']")).click();
 		
-		showFinishMessage(driver);
+		showFinishMessage(this.driver);
 		
 		//driver.quit();
 		return true;
@@ -79,7 +79,7 @@ public class E621 extends Site {
 
 	@Override
 	public ArrayList<String> getErrorReasons(ImageInfo imageInfo) {
-		ArrayList<String> reasons = new ArrayList<String>();
+		ArrayList<String> reasons = new ArrayList<>();
 
 		/*
 		 * main image
@@ -127,7 +127,7 @@ public class E621 extends Site {
 
 	@Override
 	public ArrayList<String> getWarningReasons(ImageInfo imageInfo) {
-		ArrayList<String> reasons = new ArrayList<String>();	
+		ArrayList<String> reasons = new ArrayList<>();	
 		return reasons;
 	}
 
@@ -161,7 +161,7 @@ public class E621 extends Site {
 	}
 	
 	private TreeMap<String, Tag> getTagMap(TreeSet<String> stringTags) {
-		TreeMap<String, Tag> tagMap = new TreeMap<String, Tag>();
+		TreeMap<String, Tag> tagMap = new TreeMap<>();
 		
 		for (String stringTag : stringTags) {
 			Tag realTag = FurryCrossposter.tags.get(stringTag);

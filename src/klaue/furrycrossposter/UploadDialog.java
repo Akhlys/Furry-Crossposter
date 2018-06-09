@@ -16,6 +16,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 
 import klaue.furrycrossposter.sites.Site;
 
@@ -29,7 +30,7 @@ public class UploadDialog extends JDialog implements ActionListener {
 		this.setTitle("Furry Crossposter - Upload");
 		this.setSize(700, 400);
 		this.setLocationRelativeTo(null);
-		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		this.setModal(true);
 		
 		
@@ -133,7 +134,7 @@ public class UploadDialog extends JDialog implements ActionListener {
 		}
 		
 		try {
-			boolean worked = site.doUpload(imageInfo);
+			boolean worked = site.doUpload(this.imageInfo);
 			if (!worked) {
 				JOptionPane.showMessageDialog(this, "Errors while uploading to " + site.getName(), "Furry Crossposter", JOptionPane.ERROR_MESSAGE);
 			}

@@ -59,17 +59,17 @@ public class ImagePreview extends JComponent implements PropertyChangeListener {
 	}
 
 	public void loadImage() {
-		if (file == null) {
-			thumbnail = null;
+		if (this.file == null) {
+			this.thumbnail = null;
 			return;
 		}
 
 		BufferedImage image = null;
 		try {
-			image = ImageIO.read(file);
+			image = ImageIO.read(this.file);
 		} catch (IOException e) {
 			e.printStackTrace();
-			thumbnail = null;
+			this.thumbnail = null;
 			return;
 		}
 		int width = (int) this.getSize().getWidth();
@@ -78,27 +78,28 @@ public class ImagePreview extends JComponent implements PropertyChangeListener {
 		if (image.getWidth() > width || image.getHeight() > height) {
 			image = Scalr.resize(image,  width,  height);
 		}
-		thumbnail = new ImageIcon(image);
+		this.thumbnail = new ImageIcon(image);
 	}
 
+	@Override
 	public void propertyChange(PropertyChangeEvent e) {
 		boolean update = false;
 		String prop = e.getPropertyName();
 
 		// If the directory changed, don't show an image.
 		if (JFileChooser.DIRECTORY_CHANGED_PROPERTY.equals(prop)) {
-			file = null;
+			this.file = null;
 			update = true;
 
 			// If a file became selected, find out which one.
 		} else if (JFileChooser.SELECTED_FILE_CHANGED_PROPERTY.equals(prop)) {
-			file = (File) e.getNewValue();
+			this.file = (File) e.getNewValue();
 			update = true;
 		}
 
 		// Update the preview accordingly.
 		if (update) {
-			thumbnail = null;
+			this.thumbnail = null;
 			if (isShowing()) {
 				loadImage();
 				repaint();
@@ -106,13 +107,14 @@ public class ImagePreview extends JComponent implements PropertyChangeListener {
 		}
 	}
 
+	@Override
 	protected void paintComponent(Graphics g) {
-		if (thumbnail == null) {
+		if (this.thumbnail == null) {
 			loadImage();
 		}
-		if (thumbnail != null) {
-			int x = getWidth() / 2 - thumbnail.getIconWidth() / 2;
-			int y = getHeight() / 2 - thumbnail.getIconHeight() / 2;
+		if (this.thumbnail != null) {
+			int x = getWidth() / 2 - this.thumbnail.getIconWidth() / 2;
+			int y = getHeight() / 2 - this.thumbnail.getIconHeight() / 2;
 
 			if (y < 0) {
 				y = 0;
@@ -121,7 +123,7 @@ public class ImagePreview extends JComponent implements PropertyChangeListener {
 			if (x < 5) {
 				x = 5;
 			}
-			thumbnail.paintIcon(this, g, x, y);
+			this.thumbnail.paintIcon(this, g, x, y);
 		}
 	}
 }

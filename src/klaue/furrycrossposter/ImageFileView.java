@@ -62,7 +62,8 @@ public class ImageFileView extends FileView {
 	
 	private static int ICONSIDE = 50;
 
-    public Icon getIcon(File f) {
+    @Override
+	public Icon getIcon(File f) {
     	if (f.isDirectory()) return null;
     	
         int i = f.getName().lastIndexOf('.');

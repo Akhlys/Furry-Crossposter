@@ -73,53 +73,53 @@ public class FurAffinity extends Site {
 		}
 		
 		
-		driver = getDriver();
+		this.driver = getDriver();
 
-		driver.get("https://www.furaffinity.net/login/");
+		this.driver.get("https://www.furaffinity.net/login/");
 		
 		// wait for login
-		WebDriverWait wait = new WebDriverWait(driver, 60);
+		WebDriverWait wait = new WebDriverWait(this.driver, 60);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("my-username")));
 		
-		driver.findElement(By.xpath("//a[@href='/submit/']")).click();
+		this.driver.findElement(By.xpath("//a[@href='/submit/']")).click();
 		
 		// default, "Artwork", is selected, just continue
-		driver.findElement(By.xpath("//input[@value='Next Step']")).click();
+		this.driver.findElement(By.xpath("//input[@value='Next Step']")).click();
 		
-		driver.findElement(By.name("submission")).sendKeys(imagePath.toString());
+		this.driver.findElement(By.name("submission")).sendKeys(imagePath.toString());
 		
 		if (thumbPath != null) {
-			driver.findElement(By.name("thumbnail")).sendKeys(thumbPath.toString());
+			this.driver.findElement(By.name("thumbnail")).sendKeys(thumbPath.toString());
 		}
-		driver.findElement(By.xpath("//input[@value='Next']")).click();
+		this.driver.findElement(By.xpath("//input[@value='Next']")).click();
 		
-		driver.findElement(By.name("title")).sendKeys(imageInfo.getTitle());
-		driver.findElement(By.id("JSMessage")).sendKeys(imageInfo.getDescription());
+		this.driver.findElement(By.name("title")).sendKeys(imageInfo.getTitle());
+		this.driver.findElement(By.id("JSMessage")).sendKeys(imageInfo.getDescription());
 		
 		// rating
 		if (imageInfo.getSexualRating() == RatingSexual.NUDITY_EX
 				|| imageInfo.getViolenceRating() == RatingViolence.VIOLENCE_EX) {
-			driver.findElement(By.id("rating-type-adult")).click();
+			this.driver.findElement(By.id("rating-type-adult")).click();
 		} else if (imageInfo.getSexualRating() == RatingSexual.NUDITY_MOD
 				|| imageInfo.getViolenceRating() == RatingViolence.VIOLENCE_MOD) {
-			driver.findElement(By.id("rating-type-mature")).click();
+			this.driver.findElement(By.id("rating-type-mature")).click();
 		} else {
-			driver.findElement(By.id("rating-type-general")).click();
+			this.driver.findElement(By.id("rating-type-general")).click();
 		}
 		
 		if (imageInfo.getType() == Type.TRADITIONAL) {
-			new Select(driver.findElement(By.name("cat"))).selectByVisibleText("Artwork (Traditional)");
+			new Select(this.driver.findElement(By.name("cat"))).selectByVisibleText("Artwork (Traditional)");
 		} else {
 			// digital, sketch
-			new Select(driver.findElement(By.name("cat"))).selectByVisibleText("Artwork (Digital)");
+			new Select(this.driver.findElement(By.name("cat"))).selectByVisibleText("Artwork (Digital)");
 		}
 		
 		if (imageInfo.isToScraps()) {
-			driver.findElement(By.name("scrap")).click();
+			this.driver.findElement(By.name("scrap")).click();
 		}
 		
 		// theme
-		Select typeList = new Select(driver.findElement(By.name("atype")));
+		Select typeList = new Select(this.driver.findElement(By.name("atype")));
 		WebElement entryToSelect = null;
 		for (WebElement entry : typeList.getOptions()) {
 			String textOfEntry = entry.getText().toLowerCase().replace(" ", "_");
@@ -145,7 +145,7 @@ public class FurAffinity extends Site {
 		}
 		
 		// species
-		Select speciesList = new Select(driver.findElement(By.name("species")));
+		Select speciesList = new Select(this.driver.findElement(By.name("species")));
 		ArrayList<WebElement> possibleEntries = new ArrayList<>();
 		for (WebElement entry : speciesList.getOptions()) {
 			String textOfEntry = entry.getText().toLowerCase();
@@ -169,7 +169,7 @@ public class FurAffinity extends Site {
 		}
 		
 		// gender
-		Select genderList = new Select(driver.findElement(By.name("gender")));
+		Select genderList = new Select(this.driver.findElement(By.name("gender")));
 		if (imageInfo.getGenders().size() == 0) {
 			genderList.selectByValue("7"); // Other / Not Specified
 		} else if (imageInfo.getGenders().size() > 1) {
@@ -205,11 +205,11 @@ public class FurAffinity extends Site {
 			keywordTags = keywordTags.substring(0, keywordTags.lastIndexOf(" ", 250) - 1);
 		}
 		
-		driver.findElement(By.id("keywords")).sendKeys(keywordTags);
+		this.driver.findElement(By.id("keywords")).sendKeys(keywordTags);
 		
 		
 		// folders
-		List<WebElement> fieldsets = driver.findElements(By.tagName("fieldset"));
+		List<WebElement> fieldsets = this.driver.findElements(By.tagName("fieldset"));
 		for (WebElement fieldset : fieldsets) {
 			// folder groups
 			String folderName = fieldset.findElement(By.tagName("legend")).getText();
@@ -225,9 +225,9 @@ public class FurAffinity extends Site {
 			}
 		}
 		
-		driver.findElement(By.xpath("//input[@value='Finalize']")).click();
+		this.driver.findElement(By.xpath("//input[@value='Finalize']")).click();
 		
-		showFinishMessage(driver);
+		showFinishMessage(this.driver);
 		
 		// delete img/thumb if resized to working dir
 		try {
@@ -244,7 +244,7 @@ public class FurAffinity extends Site {
 
 	@Override
 	public ArrayList<String> getErrorReasons(ImageInfo imageInfo) {
-		ArrayList<String> reasons = new ArrayList<String>();
+		ArrayList<String> reasons = new ArrayList<>();
 
 		/*
 		 * main image
@@ -323,7 +323,7 @@ public class FurAffinity extends Site {
 
 	@Override
 	public ArrayList<String> getWarningReasons(ImageInfo imageInfo) {
-		ArrayList<String> reasons = new ArrayList<String>();
+		ArrayList<String> reasons = new ArrayList<>();
 
 		try {
 			BufferedImage image = ImageIO.read(imageInfo.getImagePath().toFile());

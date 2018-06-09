@@ -35,21 +35,21 @@ public class DeviantArt extends Site {
 		
 		ChromeOptions options = new ChromeOptions();
 		options.setCapability(CapabilityType.ELEMENT_SCROLL_BEHAVIOR, ElementScrollBehavior.BOTTOM);
-		driver = getDriver(options);
+		this.driver = getDriver(options);
 		
 		
-		driver.get("https://www.deviantart.com/users/login");
+		this.driver.get("https://www.deviantart.com/users/login");
 		
-		WebDriverWait wait = new WebDriverWait(driver, 60);
+		WebDriverWait wait = new WebDriverWait(this.driver, 60);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("oh-menu-deviant")));
 		
 		// open iframe content
-		driver.get("http://www.deviantart.com/submit/deviation");//?no-overhead=1");
-		driver.switchTo().frame(driver.findElement(By.name("deviation-0")));
+		this.driver.get("http://www.deviantart.com/submit/deviation");//?no-overhead=1");
+		this.driver.switchTo().frame(this.driver.findElement(By.name("deviation-0")));
 
-		WebElement hiddenField = driver.findElement(By.name("file"));
-		if (driver instanceof JavascriptExecutor) {
-		    ((JavascriptExecutor)driver).executeScript("arguments[0].className = ''; arguments[0].parentNode.style.height='180px';", hiddenField);
+		WebElement hiddenField = this.driver.findElement(By.name("file"));
+		if (this.driver instanceof JavascriptExecutor) {
+		    ((JavascriptExecutor)this.driver).executeScript("arguments[0].className = ''; arguments[0].parentNode.style.height='180px';", hiddenField);
 		} else {
 			// the normal driver we use can use JS, but let's be sure
 		    throw new IllegalStateException("This driver does not support JavaScript!");
@@ -61,20 +61,20 @@ public class DeviantArt extends Site {
 		
 		// rating
 		if (imageInfo.getSexualRating() != RatingSexual.NONE || imageInfo.getViolenceRating() != RatingViolence.NONE) {
-			driver.findElement(By.xpath("//input[@name='ile-mature-input' and @value='yes']")).click();
+			this.driver.findElement(By.xpath("//input[@name='ile-mature-input' and @value='yes']")).click();
 			
 			// get if mature or explicit
 			if (imageInfo.getSexualRating() == RatingSexual.NUDITY_EX || imageInfo.getViolenceRating() == RatingViolence.VIOLENCE_EX) {
-				driver.findElement(By.className("ile-mature-strict")).click();
+				this.driver.findElement(By.className("ile-mature-strict")).click();
 			} else {
 				// not ex, not none
-				driver.findElement(By.className("ile-mature-moderate")).click();
+				this.driver.findElement(By.className("ile-mature-moderate")).click();
 			}
 			
 			
 			// find all checkboxes because fucking DA did not set the text as checkbox value D:
 			TreeMap<String, WebElement> checkboxes = new TreeMap<>();
-			List<WebElement> labels = driver.findElement(By.className("matureSubOptions")).findElements(By.tagName("label"));
+			List<WebElement> labels = this.driver.findElement(By.className("matureSubOptions")).findElements(By.tagName("label"));
 			for (WebElement label : labels) {
 				String text = label.getText().toLowerCase(); // first text node, not full innerhtml
 				WebElement checkbox = label.findElement(By.tagName("input"));
@@ -97,24 +97,24 @@ public class DeviantArt extends Site {
 			}
 			
 		} else {
-			driver.findElement(By.xpath("//input[@name='ile-mature-input' and @value='no']")).click();
+			this.driver.findElement(By.xpath("//input[@name='ile-mature-input' and @value='no']")).click();
 		}
 		
-		driver.findElement(By.id("devtitle")).clear();
+		this.driver.findElement(By.id("devtitle")).clear();
 		
 		if (!imageInfo.getTitle().isEmpty()) {
-			driver.findElement(By.id("devtitle")).sendKeys(imageInfo.getTitle());
+			this.driver.findElement(By.id("devtitle")).sendKeys(imageInfo.getTitle());
 		}
 		
 		if (!imageInfo.getDescription().isEmpty()) {
-			WebElement input = driver.findElement(By.cssSelector("[id^=writer][id$=-writer]"));
+			WebElement input = this.driver.findElement(By.cssSelector("[id^=writer][id$=-writer]"));
 			input.click();
 			input.sendKeys(imageInfo.getDescription());
 		}
 		
 		// theme
 		{
-			WebElement form = driver.findElement(By.id("modal-form-category"));
+			WebElement form = this.driver.findElement(By.id("modal-form-category"));
 			form.findElement(By.xpath(".//a[@menuri='artsubmit/Anthro']")).click();
 			if (imageInfo.getType() == Type.TRADITIONAL) {
 				form.findElement(By.xpath(".//a[@menuri='artsubmit/Anthro/Traditional Media']")).click();
@@ -131,8 +131,8 @@ public class DeviantArt extends Site {
 		// folder
 		if (!imageInfo.getFolders().isEmpty()) {
 			// for some reason, click() does not work on that element
-			driver.findElement(By.className("ile-gallery-groups-button")).sendKeys(Keys.ENTER);
-			WebElement popupContent = driver.findElement(By.className("ile-gallery-groups"));
+			this.driver.findElement(By.className("ile-gallery-groups-button")).sendKeys(Keys.ENTER);
+			WebElement popupContent = this.driver.findElement(By.className("ile-gallery-groups"));
 			for (WebElement label : popupContent.findElements(By.tagName("label"))) {
 				// dA adds invisible ones, like scrapbook (when did they make that one pay only? or would I have to activate it?)
 				if (!label.isDisplayed()) continue;
@@ -150,7 +150,7 @@ public class DeviantArt extends Site {
 		// therefore: DO NOT PUT THAT ABOVE THEME OR ANY OTHER ITEM BELOW IT ON THE PAGE
 		TreeSet<String> allTags = getTags(imageInfo);
 		if (!allTags.isEmpty()) {
-			WebElement input = driver.findElement(By.cssSelector("div.tags-widget"));
+			WebElement input = this.driver.findElement(By.cssSelector("div.tags-widget"));
 			input.click();
 			input = input.findElement(By.xpath(".//span//span//span"));
 			for (String tag : allTags) {
@@ -159,7 +159,7 @@ public class DeviantArt extends Site {
 			}
 		}
 		
-		for (WebElement button : driver.findElements(By.className("ile-submit-button"))) {
+		for (WebElement button : this.driver.findElements(By.className("ile-submit-button"))) {
 			if (button.isDisplayed()) {
 				// there are several buttons, but either one works
 				button.click();
@@ -167,7 +167,7 @@ public class DeviantArt extends Site {
 			}
 		}
 		
-		showFinishMessage(driver);
+		showFinishMessage(this.driver);
 		
 		//driver.quit();
 		return true;
@@ -175,7 +175,7 @@ public class DeviantArt extends Site {
 
 	@Override
 	public ArrayList<String> getErrorReasons(ImageInfo imageInfo) {
-		ArrayList<String> reasons = new ArrayList<String>();
+		ArrayList<String> reasons = new ArrayList<>();
 
 		/*
 		 * main image
@@ -230,7 +230,7 @@ public class DeviantArt extends Site {
 
 	@Override
 	public ArrayList<String> getWarningReasons(ImageInfo imageInfo) {
-		ArrayList<String> reasons = new ArrayList<String>();
+		ArrayList<String> reasons = new ArrayList<>();
 
 		if (imageInfo.getType() == ImageInfo.Type.SKETCH) {
 			reasons.add("no support for type 'sketch', will default to digital");

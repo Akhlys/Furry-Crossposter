@@ -28,30 +28,30 @@ public class Weasyl extends Site {
 		Path imagePath = imageInfo.getImagePath();
 		Path thumbPath = imageInfo.getThumbPath();
 		
-		driver = getDriver();
+		this.driver = getDriver();
 		
-		driver.get("https://www.weasyl.com/signin");
+		this.driver.get("https://www.weasyl.com/signin");
 		
 		// wait for login
-		WebDriverWait wait = new WebDriverWait(driver, 60);
+		WebDriverWait wait = new WebDriverWait(this.driver, 60);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
 
-		driver.findElement(By.xpath("//a[@href='/submit']")).click();
-		driver.findElement(By.xpath("//a[@href='/submit/visual']")).click();
+		this.driver.findElement(By.xpath("//a[@href='/submit']")).click();
+		this.driver.findElement(By.xpath("//a[@href='/submit/visual']")).click();
 		
-		driver.findElement(By.id("submitfile")).sendKeys(imagePath.toString());
+		this.driver.findElement(By.id("submitfile")).sendKeys(imagePath.toString());
 		if (thumbPath != null) {
-			driver.findElement(By.name("thumbfile")).sendKeys(thumbPath.toString());
+			this.driver.findElement(By.name("thumbfile")).sendKeys(thumbPath.toString());
 		}
 		
-		driver.findElement(By.id("submissiontitle")).sendKeys(imageInfo.getTitle());
+		this.driver.findElement(By.id("submissiontitle")).sendKeys(imageInfo.getTitle());
 		
 		if (!imageInfo.getDescription().isEmpty()) {
-			driver.findElement(By.id("submissiondesc")).sendKeys(imageInfo.getDescription());
+			this.driver.findElement(By.id("submissiondesc")).sendKeys(imageInfo.getDescription());
 		}
 		
 		// category
-		Select category = new Select(driver.findElement(By.id("submissioncat")));
+		Select category = new Select(this.driver.findElement(By.id("submissioncat")));
 		switch (imageInfo.getType()) {
 			case DIGITAL:
 				category.selectByValue("1030");
@@ -65,7 +65,7 @@ public class Weasyl extends Site {
 		}
 		
 		//rating
-		Select rating = new Select(driver.findElement(By.id("submissionrating")));
+		Select rating = new Select(this.driver.findElement(By.id("submissionrating")));
 		if (imageInfo.getSexualRating() == RatingSexual.NONE && imageInfo.getViolenceRating() == RatingViolence.NONE) {
 			rating.selectByValue("10"); // general
 		} else if (imageInfo.getSexualRating() == RatingSexual.NONE && imageInfo.getViolenceRating() != RatingViolence.VIOLENCE_EX) {
@@ -81,7 +81,7 @@ public class Weasyl extends Site {
 		}
 		
 		// folders
-		Select folderSelect = new Select(driver.findElement(By.id("submissionfolder")));
+		Select folderSelect = new Select(this.driver.findElement(By.id("submissionfolder")));
 		// weasyl has noth folders and subfolders, both of which can be used
 		// in the select, they're seperated by a /, like "parentfolder / subfolder". The problem is that foldernames
 		// themselfes can contain /, so a folder named "sub / folder" inside a folder named "parent / folder" would
@@ -114,16 +114,16 @@ public class Weasyl extends Site {
 			folderSelect.selectByVisibleText(folderToSelect.getText());
 		}
 		
-		if (imageInfo.isFriendsOnly()) driver.findElement(By.id("submit-friends")).click();
-		if (imageInfo.hasNoNotification()) driver.findElement(By.id("nonotifcation")).click();
+		if (imageInfo.isFriendsOnly()) this.driver.findElement(By.id("submit-friends")).click();
+		if (imageInfo.hasNoNotification()) this.driver.findElement(By.id("nonotifcation")).click();
 		
 		
-		driver.findElement(By.cssSelector("ul.listbuilder")).click();
-		driver.switchTo().activeElement().sendKeys(getTags(imageInfo) + " ");
+		this.driver.findElement(By.cssSelector("ul.listbuilder")).click();
+		this.driver.switchTo().activeElement().sendKeys(getTags(imageInfo) + " ");
 
-		driver.findElement(By.cssSelector("button.button.positive")).click();
+		this.driver.findElement(By.cssSelector("button.button.positive")).click();
 		
-		showFinishMessage(driver);
+		showFinishMessage(this.driver);
 		
 		//driver.quit();
 		return true;
@@ -131,7 +131,7 @@ public class Weasyl extends Site {
 
 	@Override
 	public ArrayList<String> getErrorReasons(ImageInfo imageInfo) {
-		ArrayList<String> reasons = new ArrayList<String>();
+		ArrayList<String> reasons = new ArrayList<>();
 
 		/*
 		 * main image
@@ -208,7 +208,7 @@ public class Weasyl extends Site {
 
 	@Override
 	public ArrayList<String> getWarningReasons(ImageInfo imageInfo) {
-		ArrayList<String> reasons = new ArrayList<String>();
+		ArrayList<String> reasons = new ArrayList<>();
 		
 		// none
 		

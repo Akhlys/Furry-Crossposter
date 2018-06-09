@@ -61,7 +61,7 @@ public class Tag implements Comparable<Tag>, Serializable {
 	}
 
 	public Type getType() {
-		return type;
+		return this.type;
 	}
 
 	public void setType(Type type) {
@@ -69,7 +69,7 @@ public class Tag implements Comparable<Tag>, Serializable {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -77,7 +77,7 @@ public class Tag implements Comparable<Tag>, Serializable {
 	}
 
 	public int getCount() {
-		return count;
+		return this.count;
 	}
 
 	public void setCount(int count) {
@@ -85,7 +85,7 @@ public class Tag implements Comparable<Tag>, Serializable {
 	}
 
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(int id) {
@@ -99,6 +99,6 @@ public class Tag implements Comparable<Tag>, Serializable {
 	
 	@Override
 	public String toString() {
-		return "Tag " + name + ": Type " + type + ", count " + count + ", id " + id;
+		return "Tag " + this.name + ": Type " + this.type + ", count " + this.count + ", id " + this.id;
 	}
 }

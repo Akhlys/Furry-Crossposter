@@ -11,33 +11,33 @@ public class ImageInfo implements ChangeListener {
 	public enum Type {SKETCH("Sketch"), DIGITAL("Digital"), TRADITIONAL("Traditional");
 		private final String display;
 	    private Type(String s) {
-	        display = s;
+	        this.display = s;
 	    }
 	    @Override
 	    public String toString() {
-	        return display;
+	        return this.display;
 	    }
     };
     
     public enum RatingSexual {NONE("None"), NUDITY_MOD("Moderate nudity"), NUDITY_EX("Explicit Nudity or Sex");
 	    private final String display;
 	    private RatingSexual(String s) {
-	        display = s;
+	        this.display = s;
 	    }
 	    @Override
 	    public String toString() {
-	        return display;
+	        return this.display;
 	    }
     }
     
     public enum RatingViolence {NONE("None"), VIOLENCE_MOD("Mild violence"), VIOLENCE_EX("Strong Violence, Blood");
 	    private final String display;
 	    private RatingViolence(String s) {
-	        display = s;
+	        this.display = s;
 	    }
 	    @Override
 	    public String toString() {
-	        return display;
+	        return this.display;
 	    }
 	}
     
@@ -45,10 +45,10 @@ public class ImageInfo implements ChangeListener {
     					MALEHERM("maleherm"), M2F("mtf"), F2M("ftm");
 	    private final String tag;
 	    private Gender(String s) {
-	        tag = s;
+	        this.tag = s;
 	    }
 	    public String getTag() {
-	        return tag;
+	        return this.tag;
 	    }
 	    @Override
 	    public String toString() {
@@ -70,17 +70,17 @@ public class ImageInfo implements ChangeListener {
 	private String title = "";
 	private String description = "";
 	
-	private ListenableTreeSet<Gender> genders = new ListenableTreeSet<Gender>();
+	private ListenableTreeSet<Gender> genders = new ListenableTreeSet<>();
 	
-	private ListenableTreeSet<String> speciesTags = new ListenableTreeSet<String>();
-	private ListenableTreeSet<String> kinkTags = new ListenableTreeSet<String>();
-	private ListenableTreeSet<String> otherTags = new ListenableTreeSet<String>();
+	private ListenableTreeSet<String> speciesTags = new ListenableTreeSet<>();
+	private ListenableTreeSet<String> kinkTags = new ListenableTreeSet<>();
+	private ListenableTreeSet<String> otherTags = new ListenableTreeSet<>();
 	
-	private ListenableTreeSet<String> folders = new ListenableTreeSet<String>();
+	private ListenableTreeSet<String> folders = new ListenableTreeSet<>();
 	
-	private ArrayList<ChangeListener> listeners = new ArrayList<ChangeListener>();
+	private ArrayList<ChangeListener> listeners = new ArrayList<>();
 	
-	private boolean listChangeEventWaiting = false;
+	boolean listChangeEventWaiting = false;
 	
 	public ImageInfo() {
 		this.genders.addChangeListener(this);
@@ -91,63 +91,63 @@ public class ImageInfo implements ChangeListener {
 	}
 	
 	public Path getImagePath() {
-		return imagePath;
+		return this.imagePath;
 	}
 	public void setImagePath(Path imagePath) {
 		this.imagePath = imagePath;
 		fireChangeEvent();
 	}
 	public Path getThumbPath() {
-		return thumbPath;
+		return this.thumbPath;
 	}
 	public void setThumbPath(Path thumbPath) {
 		this.thumbPath = thumbPath;
 		fireChangeEvent();
 	}
 	public Type getType() {
-		return type;
+		return this.type;
 	}
 	public void setType(Type type) {
 		this.type = type;
 		fireChangeEvent();
 	}
 	public boolean isToScraps() {
-		return toScraps;
+		return this.toScraps;
 	}
 	public void setToScraps(boolean toScraps) {
 		this.toScraps = toScraps;
 		fireChangeEvent();
 	}
 	public boolean isFriendsOnly() {
-		return friendsOnly;
+		return this.friendsOnly;
 	}
 	public void setFriendsOnly(boolean friendsOnly) {
 		this.friendsOnly = friendsOnly;
 		fireChangeEvent();
 	}
 	public boolean hasNoNotification() {
-		return noNotification;
+		return this.noNotification;
 	}
 	public void setNoNotification(boolean noNotification) {
 		this.noNotification = noNotification;
 		fireChangeEvent();
 	}
 	public boolean isUnlisted() {
-		return unlisted;
+		return this.unlisted;
 	}
 	public void setUnlisted(boolean unlisted) {
 		this.unlisted = unlisted;
 		fireChangeEvent();
 	}
 	public String getTitle() {
-		return title;
+		return this.title;
 	}
 	public void setTitle(String title) {
 		this.title = title;
 		fireChangeEvent();
 	}
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 	public void setDescription(String description) {
 		this.description = description;
@@ -167,29 +167,29 @@ public class ImageInfo implements ChangeListener {
 		this.genders.remove(gender);
 	}
 	public TreeSet<Gender> getGenders() {
-		return genders;
+		return this.genders;
 	}
 	public TreeSet<String> getSpeciesTags() {
-		return speciesTags;
+		return this.speciesTags;
 	}
 	public TreeSet<String> getOtherTags() {
-		return otherTags;
+		return this.otherTags;
 	}
 	public TreeSet<String> getKinkTags() {
-		return kinkTags;
+		return this.kinkTags;
 	}
 	public TreeSet<String> getFolders() {
-		return folders;
+		return this.folders;
 	}
 	public RatingSexual getSexualRating() {
-		return sexualRating;
+		return this.sexualRating;
 	}
 	public void setSexualRating(RatingSexual sexualRating) {
 		this.sexualRating = sexualRating;
 		fireChangeEvent();
 	}
 	public RatingViolence getViolenceRating() {
-		return violenceRating;
+		return this.violenceRating;
 	}
 	public void setViolenceRating(RatingViolence violenceRating) {
 		this.violenceRating = violenceRating;
@@ -202,9 +202,9 @@ public class ImageInfo implements ChangeListener {
 		this.listeners.remove(c);
 	}
 	
-	private void fireChangeEvent() {
+	void fireChangeEvent() {
 		ChangeEvent e = new ChangeEvent(this);
-		for (ChangeListener listener : listeners) {
+		for (ChangeListener listener : this.listeners) {
 			listener.stateChanged(e);
 		}
 	}
@@ -213,16 +213,17 @@ public class ImageInfo implements ChangeListener {
 	public void stateChanged(ChangeEvent e) {
 		// can happen multiple times in a row, as those are usually cleared and then right added to again,
 		// only fire all 100 ms max
-		if (!listChangeEventWaiting) {
-			listChangeEventWaiting = true;
+		if (!this.listChangeEventWaiting) {
+			this.listChangeEventWaiting = true;
 			new Thread(new Runnable() {
+				@Override
 				public void run() {
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
 						// ignore
 					}
-					listChangeEventWaiting = false;
+					ImageInfo.this.listChangeEventWaiting = false;
 					fireChangeEvent();
 				}
 			}).start();

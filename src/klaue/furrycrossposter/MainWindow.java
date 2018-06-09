@@ -31,7 +31,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -44,8 +43,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -68,6 +69,7 @@ import klaue.furrycrossposter.sites.Site;
 import klaue.furrycrossposter.sites.SoFurry;
 import klaue.furrycrossposter.sites.Weasyl;
 import layout.TableLayout;
+import layout.TableLayoutConstants;
 import layout.TableLayoutConstraints;
 
 public class MainWindow extends JFrame implements ActionListener, DocumentListener, ChangeListener {
@@ -88,12 +90,12 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 
 	private JButton btnSelMainImage = new JButton("Select Image");
 	private JButton btnSelThumbImage = new JButton("Select Thumbnail (optional)");
-	private JLabel imageLabel = new JLabel("", JLabel.CENTER);
-	private JLabel thumbLabel = new JLabel("", JLabel.CENTER);
+	private JLabel imageLabel = new JLabel("", SwingConstants.CENTER);
+	JLabel thumbLabel = new JLabel("", SwingConstants.CENTER);
 
-	private JComboBox<ImageInfo.Type> typeBox = new JComboBox<ImageInfo.Type>();
-	private JComboBox<ImageInfo.RatingSexual> ratingSexualBox = new JComboBox<ImageInfo.RatingSexual>();
-	private JComboBox<ImageInfo.RatingViolence> ratingViolenceBox = new JComboBox<ImageInfo.RatingViolence>();
+	private JComboBox<ImageInfo.Type> typeBox = new JComboBox<>();
+	private JComboBox<ImageInfo.RatingSexual> ratingSexualBox = new JComboBox<>();
+	private JComboBox<ImageInfo.RatingViolence> ratingViolenceBox = new JComboBox<>();
 	
 	private JTextField titleText = new JTextField();
 	private JTextArea descrText = new JTextArea(5, 10);
@@ -120,16 +122,16 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 	private JButton btnLetsDoThisShit = new JButton("Let's do this! Select pages to upload to!");
 	
 	public MainWindow() {
-		imageInfo.addChangeListener(this);
+		this.imageInfo.addChangeListener(this);
 		FileFilter imageFilter = new FileNameExtensionFilter("Image files", "jpg", "jpeg", "png", "gif");
-		fileChooser.setFileFilter(imageFilter);
-		fileChooser.setAccessory(new ImagePreview(fileChooser));
+		this.fileChooser.setFileFilter(imageFilter);
+		this.fileChooser.setAccessory(new ImagePreview(this.fileChooser));
 		//fileChooser.setFileView(new ImageFileView());
 		
-		this.setTitle("Furry Crossposter by Double Helix Industries - 1.3");
+		this.setTitle("Furry Crossposter by Double Helix Industries - 1.4");
 		this.setSize(900, 768);
 		this.setLocationRelativeTo(null);
-		this.setDefaultCloseOperation(JDialog.EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		
 		JPanel mainPanel = new JPanel();
 		mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -156,42 +158,42 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		JPanel mainImagePanel = new JPanel();
 		mainImagePanel.setLayout(new BoxLayout(mainImagePanel, BoxLayout.Y_AXIS));
 		
-		btnSelMainImage.addActionListener(this);
-		mainImagePanel.add(btnSelMainImage);
+		this.btnSelMainImage.addActionListener(this);
+		mainImagePanel.add(this.btnSelMainImage);
 		mainImagePanel.add(Box.createVerticalStrut(10));
 		
-		imageLabel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+		this.imageLabel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 		//imageLabel.setSize(100, 100);
-		imageLabel.setMinimumSize(new Dimension(200, 150));
-		imageLabel.setPreferredSize(imageLabel.getMinimumSize());
-		imageLabel.setMaximumSize(imageLabel.getMinimumSize());
-		mainImagePanel.add(imageLabel);
+		this.imageLabel.setMinimumSize(new Dimension(200, 150));
+		this.imageLabel.setPreferredSize(this.imageLabel.getMinimumSize());
+		this.imageLabel.setMaximumSize(this.imageLabel.getMinimumSize());
+		mainImagePanel.add(this.imageLabel);
 		imagesPanel.add(mainImagePanel);
 		imagesPanel.add(Box.createHorizontalStrut(10));
 		
 		JPanel thumbImagePanel = new JPanel();
 		thumbImagePanel.setLayout(new BoxLayout(thumbImagePanel, BoxLayout.Y_AXIS));
 		
-		btnSelThumbImage.addActionListener(this);
-		thumbImagePanel.add(btnSelThumbImage);
+		this.btnSelThumbImage.addActionListener(this);
+		thumbImagePanel.add(this.btnSelThumbImage);
 		thumbImagePanel.add(Box.createVerticalStrut(10));
 		
-		thumbLabel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+		this.thumbLabel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 		//imageLabel.setSize(100, 100);
-		thumbLabel.setMinimumSize(new Dimension(200, 150));
-		thumbLabel.setPreferredSize(thumbLabel.getMinimumSize());
-		thumbLabel.setMaximumSize(thumbLabel.getMinimumSize());
-		thumbLabel.addMouseListener(new MouseAdapter() {
+		this.thumbLabel.setMinimumSize(new Dimension(200, 150));
+		this.thumbLabel.setPreferredSize(this.thumbLabel.getMinimumSize());
+		this.thumbLabel.setMaximumSize(this.thumbLabel.getMinimumSize());
+		this.thumbLabel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (imageInfo.getThumbPath() != null) {
-					thumbLabel.setIcon(null);
-					imageInfo.setThumbPath(null);
+				if (MainWindow.this.imageInfo.getThumbPath() != null) {
+					MainWindow.this.thumbLabel.setIcon(null);
+					MainWindow.this.imageInfo.setThumbPath(null);
 				}
 				super.mouseClicked(e);
 			}
 		});
-		thumbImagePanel.add(thumbLabel);
+		thumbImagePanel.add(this.thumbLabel);
 		imagesPanel.add(thumbImagePanel);
 		imagesPanel.add(Box.createHorizontalStrut(10));
 		imagesPanel.add(getSeparator(SwingConstants.VERTICAL));
@@ -199,29 +201,29 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		////////////////
 		
 		// general image info
-		typeBox.setModel(new DefaultComboBoxModel<ImageInfo.Type>(ImageInfo.Type.values()));
-		typeBox.setSelectedItem(imageInfo.getType());
-		typeBox.addActionListener(this);
-		ratingSexualBox.setModel(new DefaultComboBoxModel<ImageInfo.RatingSexual>(ImageInfo.RatingSexual.values()));
-		ratingSexualBox.setSelectedItem(imageInfo.getSexualRating());
-		ratingSexualBox.addActionListener(this);
-		ratingViolenceBox.setModel(new DefaultComboBoxModel<ImageInfo.RatingViolence>(ImageInfo.RatingViolence.values()));
-		ratingViolenceBox.setSelectedItem(imageInfo.getViolenceRating());
-		ratingViolenceBox.addActionListener(this);
+		this.typeBox.setModel(new DefaultComboBoxModel<>(ImageInfo.Type.values()));
+		this.typeBox.setSelectedItem(this.imageInfo.getType());
+		this.typeBox.addActionListener(this);
+		this.ratingSexualBox.setModel(new DefaultComboBoxModel<>(ImageInfo.RatingSexual.values()));
+		this.ratingSexualBox.setSelectedItem(this.imageInfo.getSexualRating());
+		this.ratingSexualBox.addActionListener(this);
+		this.ratingViolenceBox.setModel(new DefaultComboBoxModel<>(ImageInfo.RatingViolence.values()));
+		this.ratingViolenceBox.setSelectedItem(this.imageInfo.getViolenceRating());
+		this.ratingViolenceBox.addActionListener(this);
 		
-		double sizeGeneralImageSettings[][] = {{TableLayout.PREFERRED, 10, TableLayout.FILL}, //width
-				{TableLayout.PREFERRED, 5, TableLayout.PREFERRED, 5, TableLayout.PREFERRED, 10, TableLayout.PREFERRED, 10,
-			TableLayout.PREFERRED}}; // height
+		double sizeGeneralImageSettings[][] = {{TableLayoutConstants.PREFERRED, 10, TableLayoutConstants.FILL}, //width
+				{TableLayoutConstants.PREFERRED, 5, TableLayoutConstants.PREFERRED, 5, TableLayoutConstants.PREFERRED, 10, TableLayoutConstants.PREFERRED, 10,
+			TableLayoutConstants.PREFERRED}}; // height
 		JPanel generalImageSettingsPanel = new JPanel(new TableLayout(sizeGeneralImageSettings));
 		//generalImageSettingsPanel.setLayout(new BoxLayout(generalImageSettingsPanel, BoxLayout.Y_AXIS));
 		generalImageSettingsPanel.add(new JLabel("Type:"), "0, 0");
-		generalImageSettingsPanel.add(typeBox, "2, 0");
+		generalImageSettingsPanel.add(this.typeBox, "2, 0");
 		generalImageSettingsPanel.add(new JSeparator(), "0, 2, 2, 2");
 		generalImageSettingsPanel.add(new JLabel("Ratings:"), "0, 4, 2, 4");
 		generalImageSettingsPanel.add(new JLabel("Nudity:"), "0, 6");
-		generalImageSettingsPanel.add(ratingSexualBox, "2, 6");
+		generalImageSettingsPanel.add(this.ratingSexualBox, "2, 6");
 		generalImageSettingsPanel.add(new JLabel("Violence:"), "0, 8");
-		generalImageSettingsPanel.add(ratingViolenceBox, "2, 8");
+		generalImageSettingsPanel.add(this.ratingViolenceBox, "2, 8");
 		
 		imagesPanel.add(generalImageSettingsPanel);
 		
@@ -242,70 +244,70 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		mainPanel.add(getSeparator(SwingConstants.HORIZONTAL));
 		mainPanel.add(Box.createVerticalStrut(10));
 
-		titleText.getDocument().addDocumentListener(this);
-		titleText.setAlignmentX(LEFT_ALIGNMENT);
-		titleText.setMaximumSize(new Dimension(500, titleText.getPreferredSize().height) );
+		this.titleText.getDocument().addDocumentListener(this);
+		this.titleText.setAlignmentX(LEFT_ALIGNMENT);
+		this.titleText.setMaximumSize(new Dimension(500, this.titleText.getPreferredSize().height) );
 
-		descrText.setText("Uploaded using Furry Crossposter!");
-		imageInfo.setDescription(descrText.getText());
-		descrText.getDocument().addDocumentListener(this);
-		descrText.setWrapStyleWord(true);
-		descrText.setLineWrap(true);
-		JScrollPane descrScroller = new JScrollPane(descrText);
+		this.descrText.setText("Uploaded using Furry Crossposter!");
+		this.imageInfo.setDescription(this.descrText.getText());
+		this.descrText.getDocument().addDocumentListener(this);
+		this.descrText.setWrapStyleWord(true);
+		this.descrText.setLineWrap(true);
+		JScrollPane descrScroller = new JScrollPane(this.descrText);
 		//descrScroller.setAlignmentX(LEFT_ALIGNMENT);
-		descrScroller.setMaximumSize(new Dimension(descrScroller.getMaximumSize().width, descrText.getPreferredSize().height));
-		descrScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		descrScroller.setMaximumSize(new Dimension(descrScroller.getMaximumSize().width, this.descrText.getPreferredSize().height));
+		descrScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
 		JPanel settingsChkPanel = new JPanel();
 		settingsChkPanel.setLayout(new BoxLayout(settingsChkPanel, BoxLayout.X_AXIS));
 		settingsChkPanel.setAlignmentX(LEFT_ALIGNMENT);
-		chkScraps.addActionListener(this);
-		settingsChkPanel.add(chkScraps);
+		this.chkScraps.addActionListener(this);
+		settingsChkPanel.add(this.chkScraps);
 		settingsChkPanel.add(Box.createHorizontalStrut(10));
-		chkNoNotification.addActionListener(this);
-		settingsChkPanel.add(chkNoNotification);
+		this.chkNoNotification.addActionListener(this);
+		settingsChkPanel.add(this.chkNoNotification);
 		settingsChkPanel.add(Box.createHorizontalStrut(10));
-		chkFriendsOnly.addActionListener(this);
-		settingsChkPanel.add(chkFriendsOnly);
+		this.chkFriendsOnly.addActionListener(this);
+		settingsChkPanel.add(this.chkFriendsOnly);
 		settingsChkPanel.add(Box.createHorizontalStrut(10));
-		chkUnlisted.addActionListener(this);
-		settingsChkPanel.add(chkUnlisted);
+		this.chkUnlisted.addActionListener(this);
+		settingsChkPanel.add(this.chkUnlisted);
 		
 		JPanel genderChkPanel = new JPanel();
 		genderChkPanel.setLayout(new BoxLayout(genderChkPanel, BoxLayout.X_AXIS));
 		genderChkPanel.setAlignmentX(LEFT_ALIGNMENT);
-		chkMale.addActionListener(this);
-		genderChkPanel.add(chkMale);
+		this.chkMale.addActionListener(this);
+		genderChkPanel.add(this.chkMale);
 		genderChkPanel.add(Box.createHorizontalStrut(10));
-		chkFemale.addActionListener(this);
-		genderChkPanel.add(chkFemale);
+		this.chkFemale.addActionListener(this);
+		genderChkPanel.add(this.chkFemale);
 		genderChkPanel.add(Box.createHorizontalStrut(10));
-		chkHerm.addActionListener(this);
-		genderChkPanel.add(chkHerm);
+		this.chkHerm.addActionListener(this);
+		genderChkPanel.add(this.chkHerm);
 		genderChkPanel.add(Box.createHorizontalStrut(10));
-		chkDickgirl.addActionListener(this);
-		genderChkPanel.add(chkDickgirl);
+		this.chkDickgirl.addActionListener(this);
+		genderChkPanel.add(this.chkDickgirl);
 		genderChkPanel.add(Box.createHorizontalStrut(10));
-		chkCuntboy.addActionListener(this);
-		genderChkPanel.add(chkCuntboy);
+		this.chkCuntboy.addActionListener(this);
+		genderChkPanel.add(this.chkCuntboy);
 		genderChkPanel.add(Box.createHorizontalStrut(10));
-		chkMaleherm.addActionListener(this);
-		genderChkPanel.add(chkMaleherm);
+		this.chkMaleherm.addActionListener(this);
+		genderChkPanel.add(this.chkMaleherm);
 		genderChkPanel.add(Box.createHorizontalStrut(10));
-		chkFtM.addActionListener(this);
-		genderChkPanel.add(chkFtM);
+		this.chkFtM.addActionListener(this);
+		genderChkPanel.add(this.chkFtM);
 		genderChkPanel.add(Box.createHorizontalStrut(10));
-		chkMtF.addActionListener(this);
-		genderChkPanel.add(chkMtF);
+		this.chkMtF.addActionListener(this);
+		genderChkPanel.add(this.chkMtF);
 		
-		double sizeGeneralImageInfos[][] = {{TableLayout.PREFERRED, 10, TableLayout.FILL}, //width
-				{TableLayout.PREFERRED, 10, TableLayout.PREFERRED, 5, TableLayout.PREFERRED, 5, TableLayout.PREFERRED}}; // height
+		double sizeGeneralImageInfos[][] = {{TableLayoutConstants.PREFERRED, 10, TableLayoutConstants.FILL}, //width
+				{TableLayoutConstants.PREFERRED, 10, TableLayoutConstants.PREFERRED, 5, TableLayoutConstants.PREFERRED, 5, TableLayoutConstants.PREFERRED}}; // height
 		
 		JPanel generalInfoPanel = new JPanel(new TableLayout(sizeGeneralImageInfos));
 		generalInfoPanel.setAlignmentX(LEFT_ALIGNMENT);
 		generalInfoPanel.add(new JLabel("Title:"), "0, 0");
-		generalInfoPanel.add(titleText, "2, 0");
-		generalInfoPanel.add(new JLabel("Description:"), new TableLayoutConstraints(0, 2, 0, 2, TableLayout.LEFT, TableLayout.TOP));
+		generalInfoPanel.add(this.titleText, "2, 0");
+		generalInfoPanel.add(new JLabel("Description:"), new TableLayoutConstraints(0, 2, 0, 2, TableLayoutConstants.LEFT, TableLayoutConstants.TOP));
 		generalInfoPanel.add(descrScroller, "2, 2");
 		generalInfoPanel.add(new JLabel("Settings:"), "0, 4");
 		generalInfoPanel.add(settingsChkPanel, "2, 4");
@@ -340,64 +342,66 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		mainPanel.add(Box.createVerticalStrut(10));
 		
 		DocumentFilter filter = new DocumentFilter() {
-	        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+	        @Override
+			public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
 	            fb.insertString(offset, string.replaceAll("\\n", ""), attr); 
 	        }
 
+	       @Override
 	       public void replace(FilterBypass fb, int offset, int length, String string, AttributeSet attr) throws BadLocationException {
 	            fb.insertString(offset, string.replaceAll("\\n", ""), attr); 
 	        }
 		};
 		
-		patchTabFocusChange(speciesTags);
-		speciesTags.setContentType("text/html");
-		speciesTags.setMaximumSize(new Dimension(speciesTags.getMaximumSize().width, speciesTags.getPreferredSize().height));
-		speciesTags.getDocument().addDocumentListener(this);
-		((AbstractDocument)speciesTags.getDocument()).setDocumentFilter(filter);
-		speciesTags.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK), "paste");
-		speciesTags.getActionMap().put("paste", new PasteAction(speciesTags));
-		speciesTags.setBorder(BorderFactory.createEtchedBorder());
+		patchTabFocusChange(this.speciesTags);
+		this.speciesTags.setContentType("text/html");
+		this.speciesTags.setMaximumSize(new Dimension(this.speciesTags.getMaximumSize().width, this.speciesTags.getPreferredSize().height));
+		this.speciesTags.getDocument().addDocumentListener(this);
+		((AbstractDocument)this.speciesTags.getDocument()).setDocumentFilter(filter);
+		this.speciesTags.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK), "paste");
+		this.speciesTags.getActionMap().put("paste", new PasteAction(this.speciesTags));
+		this.speciesTags.setBorder(BorderFactory.createEtchedBorder());
 		
-		patchTabFocusChange(kinkTags);
-		kinkTags.setContentType("text/html");
-		kinkTags.setMaximumSize(new Dimension(kinkTags.getMaximumSize().width, kinkTags.getPreferredSize().height));
-		kinkTags.getDocument().addDocumentListener(this);
-		((AbstractDocument)kinkTags.getDocument()).setDocumentFilter(filter);
-		kinkTags.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK), "paste");
-		kinkTags.getActionMap().put("paste", new PasteAction(kinkTags));
-		kinkTags.setBorder(BorderFactory.createEtchedBorder());
+		patchTabFocusChange(this.kinkTags);
+		this.kinkTags.setContentType("text/html");
+		this.kinkTags.setMaximumSize(new Dimension(this.kinkTags.getMaximumSize().width, this.kinkTags.getPreferredSize().height));
+		this.kinkTags.getDocument().addDocumentListener(this);
+		((AbstractDocument)this.kinkTags.getDocument()).setDocumentFilter(filter);
+		this.kinkTags.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK), "paste");
+		this.kinkTags.getActionMap().put("paste", new PasteAction(this.kinkTags));
+		this.kinkTags.setBorder(BorderFactory.createEtchedBorder());
 		
-		patchTabFocusChange(otherTags);
-		otherTags.setContentType("text/html");
-		otherTags.setMaximumSize(new Dimension(otherTags.getMaximumSize().width, otherTags.getPreferredSize().height));
-		otherTags.getDocument().addDocumentListener(this);
-		((AbstractDocument)otherTags.getDocument()).setDocumentFilter(filter);
-		otherTags.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK), "paste");
-		otherTags.getActionMap().put("paste", new PasteAction(otherTags));
-		otherTags.setBorder(BorderFactory.createEtchedBorder());
+		patchTabFocusChange(this.otherTags);
+		this.otherTags.setContentType("text/html");
+		this.otherTags.setMaximumSize(new Dimension(this.otherTags.getMaximumSize().width, this.otherTags.getPreferredSize().height));
+		this.otherTags.getDocument().addDocumentListener(this);
+		((AbstractDocument)this.otherTags.getDocument()).setDocumentFilter(filter);
+		this.otherTags.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK), "paste");
+		this.otherTags.getActionMap().put("paste", new PasteAction(this.otherTags));
+		this.otherTags.setBorder(BorderFactory.createEtchedBorder());
 		
-		double sizeTags[][] = {{TableLayout.PREFERRED, 10, TableLayout.FILL}, //width
-				{TableLayout.PREFERRED, 9, TableLayout.PREFERRED, 9, TableLayout.PREFERRED}}; // height
+		double sizeTags[][] = {{TableLayoutConstants.PREFERRED, 10, TableLayoutConstants.FILL}, //width
+				{TableLayoutConstants.PREFERRED, 9, TableLayoutConstants.PREFERRED, 9, TableLayoutConstants.PREFERRED}}; // height
 		JPanel pnlTags = new JPanel(new TableLayout(sizeTags));
 		pnlTags.setAlignmentX(LEFT_ALIGNMENT);
 		pnlTags.add(new JLabel("Species:"), "0, 0");
-		pnlTags.add(speciesTags, "2, 0");
+		pnlTags.add(this.speciesTags, "2, 0");
 		pnlTags.add(new JLabel("Kinks:"), "0, 2");
-		pnlTags.add(kinkTags, "2, 2");
+		pnlTags.add(this.kinkTags, "2, 2");
 		pnlTags.add(new JLabel("Others:"), "0, 4");
-		pnlTags.add(otherTags, "2, 4");
+		pnlTags.add(this.otherTags, "2, 4");
 		pnlTags.setMaximumSize(new Dimension(pnlTags.getMaximumSize().width, pnlTags.getPreferredSize().height));
 		
 		mainPanel.add(pnlTags);
 		mainPanel.add(Box.createVerticalGlue());
 		
-		lblNonworkingSizes.setFont(lblNonworkingSizes.getFont().deriveFont(Font.PLAIN));
-		mainPanel.add(lblNonworkingSizes);
+		this.lblNonworkingSizes.setFont(this.lblNonworkingSizes.getFont().deriveFont(Font.PLAIN));
+		mainPanel.add(this.lblNonworkingSizes);
 		mainPanel.add(Box.createVerticalStrut(10));
 
-		btnLetsDoThisShit.addActionListener(this);
-		btnLetsDoThisShit.setEnabled(false);
-		mainPanel.add(btnLetsDoThisShit);
+		this.btnLetsDoThisShit.addActionListener(this);
+		this.btnLetsDoThisShit.setEnabled(false);
+		mainPanel.add(this.btnLetsDoThisShit);
 		
 		this.setVisible(true);
 	}
@@ -420,9 +424,9 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 	}
 	
 	private void patchTabFocusChange(Component c) {
-		Set<KeyStroke> strokes = new HashSet<KeyStroke>(Arrays.asList(KeyStroke.getKeyStroke("pressed TAB")));
+		Set<KeyStroke> strokes = new HashSet<>(Arrays.asList(KeyStroke.getKeyStroke("pressed TAB")));
         c.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, strokes);
-        strokes = new HashSet<KeyStroke>(Arrays.asList(KeyStroke.getKeyStroke("shift pressed TAB")));
+        strokes = new HashSet<>(Arrays.asList(KeyStroke.getKeyStroke("shift pressed TAB")));
         c.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, strokes);
 	}
 
@@ -433,41 +437,41 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		} else if (arg0.getSource() == this.btnSelThumbImage) {
 			openImage(true);
 		} else if (arg0.getSource() == this.typeBox) {
-			ImageInfo.Type type = (ImageInfo.Type)typeBox.getSelectedItem();
-			imageInfo.setType(type);
+			ImageInfo.Type type = (ImageInfo.Type)this.typeBox.getSelectedItem();
+			this.imageInfo.setType(type);
 		} else if (arg0.getSource() == this.ratingSexualBox) {
-			ImageInfo.RatingSexual rating = (ImageInfo.RatingSexual)ratingSexualBox.getSelectedItem();
-			imageInfo.setSexualRating(rating);
+			ImageInfo.RatingSexual rating = (ImageInfo.RatingSexual)this.ratingSexualBox.getSelectedItem();
+			this.imageInfo.setSexualRating(rating);
 		} else if (arg0.getSource() == this.ratingViolenceBox) {
-			ImageInfo.RatingViolence rating = (ImageInfo.RatingViolence)ratingViolenceBox.getSelectedItem();
-			imageInfo.setViolenceRating(rating);
+			ImageInfo.RatingViolence rating = (ImageInfo.RatingViolence)this.ratingViolenceBox.getSelectedItem();
+			this.imageInfo.setViolenceRating(rating);
 		} else if (arg0.getSource() == this.chkScraps) {
-			imageInfo.setToScraps(chkScraps.isSelected());
+			this.imageInfo.setToScraps(this.chkScraps.isSelected());
 		} else if (arg0.getSource() == this.chkNoNotification) {
-			imageInfo.setNoNotification(chkNoNotification.isSelected());
+			this.imageInfo.setNoNotification(this.chkNoNotification.isSelected());
 		} else if (arg0.getSource() == this.chkFriendsOnly) {
-			imageInfo.setFriendsOnly(chkFriendsOnly.isSelected());
+			this.imageInfo.setFriendsOnly(this.chkFriendsOnly.isSelected());
 		} else if (arg0.getSource() == this.chkUnlisted) {
-			imageInfo.setUnlisted(chkUnlisted.isSelected());
+			this.imageInfo.setUnlisted(this.chkUnlisted.isSelected());
 		} else if (arg0.getSource() == this.chkMale) {
-			imageInfo.setGender(ImageInfo.Gender.MALE, chkMale.isSelected());
+			this.imageInfo.setGender(ImageInfo.Gender.MALE, this.chkMale.isSelected());
 		} else if (arg0.getSource() == this.chkFemale) {
-			imageInfo.setGender(ImageInfo.Gender.FEMALE, chkFemale.isSelected());
+			this.imageInfo.setGender(ImageInfo.Gender.FEMALE, this.chkFemale.isSelected());
 		} else if (arg0.getSource() == this.chkHerm) {
-			imageInfo.setGender(ImageInfo.Gender.HERM, chkHerm.isSelected());
+			this.imageInfo.setGender(ImageInfo.Gender.HERM, this.chkHerm.isSelected());
 		} else if (arg0.getSource() == this.chkDickgirl) {
-			imageInfo.setGender(ImageInfo.Gender.DICKGIRL, chkDickgirl.isSelected());
+			this.imageInfo.setGender(ImageInfo.Gender.DICKGIRL, this.chkDickgirl.isSelected());
 		} else if (arg0.getSource() == this.chkCuntboy) {
-			imageInfo.setGender(ImageInfo.Gender.CUNTBOY, chkCuntboy.isSelected());
+			this.imageInfo.setGender(ImageInfo.Gender.CUNTBOY, this.chkCuntboy.isSelected());
 		} else if (arg0.getSource() == this.chkMaleherm) {
-			imageInfo.setGender(ImageInfo.Gender.MALEHERM, chkMaleherm.isSelected());
+			this.imageInfo.setGender(ImageInfo.Gender.MALEHERM, this.chkMaleherm.isSelected());
 		} else if (arg0.getSource() == this.chkMtF) {
-			imageInfo.setGender(ImageInfo.Gender.M2F, chkMtF.isSelected());
+			this.imageInfo.setGender(ImageInfo.Gender.M2F, this.chkMtF.isSelected());
 		} else if (arg0.getSource() == this.chkFtM) {
-			imageInfo.setGender(ImageInfo.Gender.M2F, chkFtM.isSelected());
+			this.imageInfo.setGender(ImageInfo.Gender.M2F, this.chkFtM.isSelected());
 		} else if (arg0.getSource() == this.btnLetsDoThisShit) {
 			// will only happen if at least one page works
-			new UploadDialog(imageInfo, pages);
+			new UploadDialog(this.imageInfo, pages);
 		}
 	}
 
@@ -475,17 +479,17 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 	@Override
 	public void changedUpdate(DocumentEvent arg0) {
 		if (arg0.getDocument() == this.titleText.getDocument()) {
-			imageInfo.setTitle(this.titleText.getText().trim());
+			this.imageInfo.setTitle(this.titleText.getText().trim());
 		} else if (arg0.getDocument() == this.descrText.getDocument()) {
-			imageInfo.setDescription(this.descrText.getText().trim());
+			this.imageInfo.setDescription(this.descrText.getText().trim());
 		}
-		if (arg0.getDocument() == speciesTags.getDocument() || arg0.getDocument() == kinkTags.getDocument()
-				|| arg0.getDocument() == otherTags.getDocument()) {
+		if (arg0.getDocument() == this.speciesTags.getDocument() || arg0.getDocument() == this.kinkTags.getDocument()
+				|| arg0.getDocument() == this.otherTags.getDocument()) {
 			
 			// get the pane
-			JTextPane pane = (arg0.getDocument() == speciesTags.getDocument()) ?  speciesTags : null;
-			pane = (pane != null) ? pane : ((arg0.getDocument() == kinkTags.getDocument()) ?  kinkTags : null);
-			pane = (pane != null) ? pane : ((arg0.getDocument() == otherTags.getDocument()) ?  otherTags : null);
+			JTextPane pane = (arg0.getDocument() == this.speciesTags.getDocument()) ?  this.speciesTags : null;
+			pane = (pane != null) ? pane : ((arg0.getDocument() == this.kinkTags.getDocument()) ?  this.kinkTags : null);
+			pane = (pane != null) ? pane : ((arg0.getDocument() == this.otherTags.getDocument()) ?  this.otherTags : null);
 			
 			// derefer all further stuff to thread to be started immediately. SwingUtilities.invokeLater() makes
 			// sure it is started right after the change event went through, which is needed to edit the text and
@@ -510,15 +514,15 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		changedUpdate(arg0);
 	}
 	
-	private void textPaneChanged(JTextPane pane) {
+	void textPaneChanged(JTextPane pane) {
 		// tags will be added below again
-		if (pane == otherTags) {
-			imageInfo.getFolders().clear();
-			imageInfo.getOtherTags().clear();
-		} else if(pane == speciesTags) {
-			imageInfo.getSpeciesTags().clear();
-		} else if(pane == kinkTags) {
-			imageInfo.getKinkTags().clear();
+		if (pane == this.otherTags) {
+			this.imageInfo.getFolders().clear();
+			this.imageInfo.getOtherTags().clear();
+		} else if(pane == this.speciesTags) {
+			this.imageInfo.getSpeciesTags().clear();
+		} else if(pane == this.kinkTags) {
+			this.imageInfo.getKinkTags().clear();
 		}
 		
 		
@@ -572,19 +576,18 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 			}
 			
 			// special tags first, if other field
-			if (pane == otherTags) {
+			if (pane == this.otherTags) {
 				if (word.startsWith("#")) {
 					// do not check
 					newHTMLText.append(word);
-					imageInfo.getFolders().add(word.substring(1));
+					this.imageInfo.getFolders().add(word.substring(1));
 					continue;
-				} else {
-					imageInfo.getOtherTags().add(word);
 				}
-			} else if(pane == speciesTags) {
-				imageInfo.getSpeciesTags().add(word);
-			} else if(pane == kinkTags) {
-				imageInfo.getKinkTags().add(word);
+				this.imageInfo.getOtherTags().add(word);
+			} else if(pane == this.speciesTags) {
+				this.imageInfo.getSpeciesTags().add(word);
+			} else if(pane == this.kinkTags) {
+				this.imageInfo.getKinkTags().add(word);
 			}
 			
 			Tag tag = FurryCrossposter.tags.get(searchWord);
@@ -593,9 +596,9 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 				newHTMLText.append("<font color=\"red\">").append(word).append("</font>");
 			} else {
 				// check if tag is in right field
-				if ((tag.getType() == Tag.Type.ARTIST && pane != otherTags)
-						|| (tag.getType() == Tag.Type.SPECIES && pane != speciesTags)
-						|| (tag.getType() != Tag.Type.SPECIES && pane == speciesTags)) {
+				if ((tag.getType() == Tag.Type.ARTIST && pane != this.otherTags)
+						|| (tag.getType() == Tag.Type.SPECIES && pane != this.speciesTags)
+						|| (tag.getType() != Tag.Type.SPECIES && pane == this.speciesTags)) {
 					newHTMLText.append("<font color=\"purple\">").append(word).append("</font>");
 					continue;
 				}
@@ -617,13 +620,13 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 	}
 	
 	private void openImage(boolean thumb) {
-		JLabel labelToDisplay = thumb ? thumbLabel : imageLabel;
+		JLabel labelToDisplay = thumb ? this.thumbLabel : this.imageLabel;
 		
-		if (fileChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
+		if (this.fileChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
 		
-		File imageFile = fileChooser.getSelectedFile();
+		File imageFile = this.fileChooser.getSelectedFile();
 		BufferedImage image = null;
 		try {
 			image = ImageTools.getResizedInstance(labelToDisplay.getPreferredSize().width, labelToDisplay.getPreferredSize().height, imageFile);
@@ -637,20 +640,20 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		labelToDisplay.setIcon(imageIcon);
 		
 		if (thumb) {
-			imageInfo.setThumbPath(imageFile.toPath());
+			this.imageInfo.setThumbPath(imageFile.toPath());
 		} else {
-			imageInfo.setImagePath(imageFile.toPath());
+			this.imageInfo.setImagePath(imageFile.toPath());
 		}
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		if (e.getSource() != imageInfo) return;
+		if (e.getSource() != this.imageInfo) return;
 		
 		StringBuffer sitesNotWorking = new StringBuffer();
 		boolean worksOnAtLeastOneSite = false;
 		for (Site site : pages) {
-			if (!site.canUpload(imageInfo)) {
+			if (!site.canUpload(this.imageInfo)) {
 				sitesNotWorking.append(site.getName()).append(", ");
 			} else {
 				worksOnAtLeastOneSite = true;
@@ -660,11 +663,11 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		
 		
 		if (sitesNotWorking.length() > 0 && worksOnAtLeastOneSite) {
-			lblNonworkingSizes.setText("Above config will not work on: " + sitesNotWorking.toString());
+			this.lblNonworkingSizes.setText("Above config will not work on: " + sitesNotWorking.toString());
 		} else {
-			lblNonworkingSizes.setText("");
+			this.lblNonworkingSizes.setText("");
 		}
-		btnLetsDoThisShit.setEnabled(worksOnAtLeastOneSite);
+		this.btnLetsDoThisShit.setEnabled(worksOnAtLeastOneSite);
 	}
 }
 
@@ -679,13 +682,13 @@ class PasteAction extends AbstractAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
-			int offset = thePane.getSelectionStart();
-			Document sd = thePane.getDocument();
+			int offset = this.thePane.getSelectionStart();
+			Document sd = this.thePane.getDocument();
 			String value = getClipboard();
-			sd.remove(thePane.getSelectionStart(), thePane.getSelectionEnd() - thePane.getSelectionStart());
-			thePane.getDocument().insertString(offset, value, null);
+			sd.remove(this.thePane.getSelectionStart(), this.thePane.getSelectionEnd() - this.thePane.getSelectionStart());
+			this.thePane.getDocument().insertString(offset, value, null);
 			if (value != null) {
-				thePane.setCaretPosition(offset + value.length());
+				this.thePane.setCaretPosition(offset + value.length());
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

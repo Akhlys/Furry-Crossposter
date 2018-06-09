@@ -45,6 +45,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 
+import org.imgscalr.Scalr;
+
 /* ImagePreview.java by FileChooserDemo2.java. */
 public class ImagePreview extends JComponent implements PropertyChangeListener {
 	private static final long serialVersionUID = 6883402245318564687L;
@@ -74,7 +76,7 @@ public class ImagePreview extends JComponent implements PropertyChangeListener {
 		int height = (int) this.getSize().getHeight();
 
 		if (image.getWidth() > width || image.getHeight() > height) {
-			image = ImageTools.getResizedInstance(width, height, image);
+			image = Scalr.resize(image,  width,  height);
 		}
 		thumbnail = new ImageIcon(image);
 	}

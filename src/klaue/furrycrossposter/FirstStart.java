@@ -115,9 +115,7 @@ public class FirstStart extends JDialog implements WindowListener {
 				options.addArguments("user-data-dir=" + profileDir);
 				options.addArguments("profile-directory=" + chromeProfilePath.getFileName().toString());
 				options.addArguments("--start-maximized");
-				DesiredCapabilities desiredCapabilities = DesiredCapabilities.chrome();
-				desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, options);
-				WebDriver webDriver = new ChromeDriver(desiredCapabilities);
+				WebDriver webDriver = new ChromeDriver(options);
 				webDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 				webDriver.get("https://www.google.com");
 				((JavascriptExecutor)webDriver).executeScript("alert('Furry Crossposter - chrome profile set up');");

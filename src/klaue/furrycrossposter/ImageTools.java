@@ -8,6 +8,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.imgscalr.Scalr;
+
 public class ImageTools {
 	/**
 	 * Returns a new image that is the original image, resized preserving aspect ratio, to not be larger than
@@ -29,20 +31,8 @@ public class ImageTools {
 		resizedWidth  = resizedWidth  > 0.5 ? Math.floor(resizedWidth)  : 1;
 		resizedHeight = resizedHeight > 0.5 ? Math.floor(resizedHeight) : 1;
 		
-		return getResizedImage(original, (int)resizedWidth, (int)resizedHeight);
-	}
-	
-	/**
-	 * Returns a new image that is the original image, resized preserving aspect ratio, so that neither with is larger
-	 * than maxWidth nor height larger than MaxHeight.
-	 * As the resize is preserving aspect ratio, one size may be considerably smaller than max
-	 * @param maxWidth the maximum width
-	 * @param maxHeight the maximum height
-	 * @param original
-	 * @return a resized BufferedImage instance
-	 */
-	public static BufferedImage getResizedInstance(int maxWidth, int maxHeight, BufferedImage original) {
-	    return getResizedImage(original, maxWidth, maxHeight);
+		// refactor, use scalr
+		return Scalr.resize(original, (int)resizedWidth, (int)resizedHeight);
 	}
 	
 	/**
@@ -70,7 +60,8 @@ public class ImageTools {
 	 * @throws IllegalArgumentException 
 	 */
 	public static BufferedImage getResizedInstance(int maxWidth, int maxHeight, File imageFile) throws IllegalArgumentException, IOException {
-		return getResizedInstance(maxWidth, maxHeight, getImageFromFile(imageFile));
+		// refactor, use scalr
+		return Scalr.resize(getImageFromFile(imageFile), maxWidth, maxHeight);
 	}
 
 	/**
@@ -98,7 +89,8 @@ public class ImageTools {
 	 * @throws IllegalArgumentException 
 	 */
 	public static void getResizedFile(int maxWidth, int maxHeight, BufferedImage image, File targetFile) throws IllegalArgumentException, IOException {
-		saveImageToFile(getResizedInstance(maxWidth, maxHeight, image), targetFile);
+		// refactor, use scalr
+		saveImageToFile(Scalr.resize(image, maxWidth, maxHeight), targetFile);
 	}
 	
 	/**
@@ -126,21 +118,8 @@ public class ImageTools {
 	 * @throws IllegalArgumentException 
 	 */
 	public static void getResizedFile(int maxWidth, int maxHeight, File imageFile, File targetFile) throws IllegalArgumentException, IOException {
-		saveImageToFile(getResizedInstance(maxWidth, maxHeight, getImageFromFile(imageFile)), targetFile);
-	}
-	
-	private static BufferedImage getResizedImage(BufferedImage img, int width, int height) {
-		int beforeWidth = img.getWidth();
-		int beforeHeight = img.getHeight();
-		double zoomX = beforeWidth / (double)width;
-		double zoomY = beforeHeight / (double)height;
-		
-		// -1: keep aspect ratio
-		if (zoomX > zoomY) {
-			return toBufferedImage(img.getScaledInstance(width, -1, Image.SCALE_SMOOTH));
-		} else {
-			return toBufferedImage(img.getScaledInstance(-1, height, Image.SCALE_SMOOTH));
-		}
+		// refactor, use scalr
+		saveImageToFile(Scalr.resize(getImageFromFile(imageFile), maxWidth, maxHeight), targetFile);
 	}
 	
 	private static BufferedImage getImageFromFile(File imageFile) throws IOException, IllegalArgumentException {
@@ -155,23 +134,5 @@ public class ImageTools {
 		if (i == -1) throw new IllegalArgumentException("Save file has no extension/type: " + targetFile.getName());
 		String extension = targetFile.getName().toString().substring(i+1).toLowerCase();
 		ImageIO.write(image, extension, targetFile);
-	}
-	
-	/**
-	 * Converts a given Image into a BufferedImage
-	 *
-	 * @param img The Image to be converted
-	 * @return The converted BufferedImage
-	 */
-	private static BufferedImage toBufferedImage(Image img) {
-	    if (img instanceof BufferedImage) {
-	        return (BufferedImage) img;
-	    }
-	    BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-	    Graphics2D bGr = bimage.createGraphics();
-	    bGr.drawImage(img, 0, 0, null);
-	    bGr.dispose();
-
-	    return bimage;
 	}
 }

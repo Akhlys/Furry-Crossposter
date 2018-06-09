@@ -65,8 +65,8 @@ import klaue.furrycrossposter.sites.FurAffinity;
 import klaue.furrycrossposter.sites.FurryNetwork;
 import klaue.furrycrossposter.sites.InkBunny;
 import klaue.furrycrossposter.sites.Site;
+import klaue.furrycrossposter.sites.SoFurry;
 import klaue.furrycrossposter.sites.Weasyl;
-import klaue.furrycrossposter.sites.sofurry.SoFurry;
 import layout.TableLayout;
 import layout.TableLayoutConstraints;
 
@@ -126,7 +126,7 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		fileChooser.setAccessory(new ImagePreview(fileChooser));
 		//fileChooser.setFileView(new ImageFileView());
 		
-		this.setTitle("Furry Crossposter by Double Helix Industries - 1.2");
+		this.setTitle("Furry Crossposter by Double Helix Industries - 1.3");
 		this.setSize(900, 768);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JDialog.EXIT_ON_CLOSE);

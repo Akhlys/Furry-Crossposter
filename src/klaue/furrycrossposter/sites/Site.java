@@ -11,6 +11,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +29,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import klaue.furrycrossposter.FurryCrossposter;
 import klaue.furrycrossposter.ImageInfo;
@@ -75,19 +76,24 @@ public abstract class Site {
 	public abstract ArrayList<String> getErrorReasons(ImageInfo imageInfo);
 	
 	protected WebDriver getDriver(){
-		return getDriver(DesiredCapabilities.chrome());
+		return getDriver(new ChromeOptions());
 	}
 	
-	protected WebDriver getDriver(DesiredCapabilities desiredCapabilities) {
+	protected WebDriver getDriver(ChromeOptions options) {
 		if (FurryCrossposter.chromeProfile != null) {
-			ChromeOptions options = new ChromeOptions();
 			String profileDir = FurryCrossposter.chromeProfile.getParent().toString().replace("\\", "/");
 			options.addArguments("user-data-dir=" + profileDir);
 			options.addArguments("profile-directory=" + FurryCrossposter.chromeProfile.getFileName().toString());
 			options.addArguments("--start-maximized");
-			desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, options);
+			
+			// try to enable password saving, even tho it seems to be disabled now and at
+			// least on linux this isn't working
+			Map<String, Object> prefs = new LinkedHashMap<>();
+			prefs.put("credentials_enable_service", Boolean.valueOf(true));
+			prefs.put("profile.password_manager_enabled", Boolean.valueOf(true));
+			options.setExperimentalOption("prefs", prefs);
 		}
-		WebDriver driver = new ChromeDriver(desiredCapabilities);
+		WebDriver driver = new ChromeDriver(options);
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 		return driver;
 	}

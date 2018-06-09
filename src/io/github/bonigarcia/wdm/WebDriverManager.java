@@ -21,10 +21,10 @@ import java.util.List;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.firefox.MarionetteDriver;
+//import org.openqa.selenium.firefox.MarionetteDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.opera.OperaDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
+//import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
 /**
  * Generic manager.
@@ -56,12 +56,12 @@ public class WebDriverManager extends BrowserManager {
 			//browserManagerClass = EdgeDriverManager.class;
 			browserManagerClass = VoidDriverManager.class;
 
-		} else if (webDriverClass.equals(PhantomJSDriver.class)) {
-			//browserManagerClass = PhantomJsDriverManager.class;
-			browserManagerClass = VoidDriverManager.class;
-
-		} else if (webDriverClass.equals(MarionetteDriver.class)) {
-			browserManagerClass = MarionetteDriverManager.class;
+//		} else if (webDriverClass.equals(PhantomJSDriver.class)) {
+//			//browserManagerClass = PhantomJsDriverManager.class;
+//			browserManagerClass = VoidDriverManager.class;
+//
+//		} else if (webDriverClass.equals(MarionetteDriver.class)) {
+//			browserManagerClass = MarionetteDriverManager.class;
 
 		} else {
 			browserManagerClass = VoidDriverManager.class;

@@ -1,4 +1,4 @@
-package klaue.furrycrossposter.sites.sofurry;
+package klaue.furrycrossposter.sites;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,7 +17,6 @@ import klaue.furrycrossposter.ImageInfo;
 import klaue.furrycrossposter.ImageInfo.Gender;
 import klaue.furrycrossposter.ImageInfo.RatingSexual;
 import klaue.furrycrossposter.ImageInfo.RatingViolence;
-import klaue.furrycrossposter.sites.Site;
 
 public class SoFurry extends Site {
 	private WebDriver driver;
@@ -28,36 +27,6 @@ public class SoFurry extends Site {
 	@Override
 	public boolean doUpload(final ImageInfo imageInfo) {
 		if (!canUpload(imageInfo)) return false;
-		
-//		String[] credentials = getUserPassword(sofurryPropertiesPath);
-//		if (credentials == null) return false; // no uplad without user/pass
-//		
-//		user = credentials[0];
-//		password = credentials[1];
-//		
-//		SoFurryAuthentification soa = new SoFurryAuthentification(user, password);
-//		// first request the submission of the furrycrossposter-image so we don't have to send the whole file to upload
-//		// multiple time for sofurrys OTP login
-//		TreeMap<String, String> params = new TreeMap<>();
-//		params.put("id", "1043958");
-//		String reply = soa.requestPost("http://api2.sofurry.com/std/getSubmissionDetails", params);
-//		if (reply == null) {
-//			JOptionPane.showMessageDialog(null, "Could not log in to SoFurry", "Error", JOptionPane.ERROR_MESSAGE);
-//			// remove the entries from the properties
-//			removeUserPasswordFromProperties(sofurryPropertiesPath);
-//			return false;
-//		}
-//		
-//		// if we came to this area, it means username worked and all, yay, so let's upload our file
-//		params = new TreeMap<>();
-//		params.put("f", "postBinary");
-//		params.put("id", ""); // new
-//		params.put("contentType", "artwork");
-//		params.put("cb", "496"); // no clue what this is for
-//		reply = soa.requestPostMultipart("https://chat.sofurry.com/ajaxfetch.php", params, "file", imageInfo.getImagePath().toFile());
-//		System.out.println(reply);
-//		
-//		return true;
 
 		Path imagePath = imageInfo.getImagePath();
 		Path thumbPath = imageInfo.getThumbPath();

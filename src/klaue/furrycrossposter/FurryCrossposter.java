@@ -1,7 +1,5 @@
 package klaue.furrycrossposter;
 
-import io.github.bonigarcia.wdm.ChromeDriverManager;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +13,8 @@ import java.util.TreeSet;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
+import io.github.bonigarcia.wdm.ChromeDriverManager;
 
 /**
  * the main and start class of furry crossposter
@@ -71,6 +71,8 @@ public class FurryCrossposter extends JFrame {
 		// now that we have a working dir, download latest driver
 		System.setProperty("wdm.targetPath", workingDir.toString());
 		ChromeDriverManager.getInstance().setup();
+//		ChromeDriverManager.getInstance().setup(Architecture
+//				.valueOf("x" + System.getProperty("sun.arch.data.model")), "2.38");
 		
 		// if it doesn't contain the tag file, first start wizard did not run
 		if (!Files.exists(workingDir.resolve("tags"))) {

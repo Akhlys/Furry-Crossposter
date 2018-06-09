@@ -8,22 +8,22 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import klaue.furrycrossposter.ImageInfo;
-import klaue.furrycrossposter.ImageInfo.Gender;
-import klaue.furrycrossposter.ImageInfo.RatingSexual;
-import klaue.furrycrossposter.ImageInfo.RatingViolence;
-import klaue.furrycrossposter.ImageInfo.Type;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.internal.ElementScrollBehavior;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import klaue.furrycrossposter.ImageInfo;
+import klaue.furrycrossposter.ImageInfo.Gender;
+import klaue.furrycrossposter.ImageInfo.RatingSexual;
+import klaue.furrycrossposter.ImageInfo.RatingViolence;
+import klaue.furrycrossposter.ImageInfo.Type;
 
 public class DeviantArt extends Site {
 	private WebDriver driver;
@@ -33,9 +33,9 @@ public class DeviantArt extends Site {
 		if (!canUpload(imageInfo)) return false;
 		Path imagePath = imageInfo.getImagePath();
 		
-		DesiredCapabilities desiredCapabilities = DesiredCapabilities.firefox();
-		desiredCapabilities.setCapability(CapabilityType.ELEMENT_SCROLL_BEHAVIOR, ElementScrollBehavior.BOTTOM);
-		driver = getDriver(desiredCapabilities);
+		ChromeOptions options = new ChromeOptions();
+		options.setCapability(CapabilityType.ELEMENT_SCROLL_BEHAVIOR, ElementScrollBehavior.BOTTOM);
+		driver = getDriver(options);
 		
 		
 		driver.get("https://www.deviantart.com/users/login");

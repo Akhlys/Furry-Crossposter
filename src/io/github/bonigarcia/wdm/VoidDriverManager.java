@@ -1,67 +1,85 @@
 /*
- * (C) Copyright 2015 Boni Garcia (http://bonigarcia.github.io/)
+ * (C) Copyright 2019 Boni Garcia (http://bonigarcia.github.io/)
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 package io.github.bonigarcia.wdm;
 
-import java.net.MalformedURLException;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+
+import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Void manager.
  *
  * @author Boni Garcia (boni.gg@gmail.com)
- * @since 1.3.1
+ * @since 3.2.0
  */
-public class VoidDriverManager extends BrowserManager {
+public class VoidDriverManager extends WebDriverManager {
 
-	private static VoidDriverManager instance;
+    @Override
+    protected List<URL> getDrivers() throws IOException {
+        return emptyList();
+    }
 
-	public VoidDriverManager() {
-	}
+    @Override
+    protected Optional<String> getBrowserVersion() {
+        return empty();
+    }
 
-	public static synchronized VoidDriverManager getInstance() {
-		if (instance == null) {
-			instance = new VoidDriverManager();
-		}
-		return instance;
-	}
+    @Override
+    protected String getDriverVersion() {
+        return "";
+    }
 
-	@Override
-	public List<URL> getDrivers() throws Exception {
-		return Collections.emptyList();
-	}
+    @Override
+    protected URL getDriverUrl() {
+        return null;
+    }
 
-	@Override
-	protected String getExportParameter() {
-		return "";
-	}
+    @Override
+    protected Optional<URL> getMirrorUrl() {
+        return empty();
+    }
 
-	@Override
-	protected String getDriverVersion() {
-		return "";
-	}
+    @Override
+    protected Optional<String> getExportParameter() {
+        return empty();
+    }
 
-	@Override
-	protected URL getDriverUrl() throws MalformedURLException {
-		return null;
-	}
+    @Override
+    protected DriverManagerType getDriverManagerType() {
+        return null;
+    }
 
-	@Override
-	protected List<String> getDriverName() {
-		return Arrays.asList("");
-	}
+    @Override
+    protected String getDriverName() {
+        return "";
+    }
+
+    @Override
+    protected void setDriverVersion(String version) {
+        // Nothing required
+    }
+
+    @Override
+    protected void setDriverUrl(URL url) {
+        // Nothing required
+    }
+
 }

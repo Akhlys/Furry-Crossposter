@@ -1,20 +1,38 @@
 /*
  * (C) Copyright 2015 Boni Garcia (http://bonigarcia.github.io/)
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 package io.github.bonigarcia.wdm;
 
-import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
+import static java.io.File.separator;
+import static java.lang.Runtime.getRuntime;
+import static java.lang.invoke.MethodHandles.lookup;
+import static java.nio.file.Files.createTempDirectory;
+import static java.nio.file.Files.delete;
+import static java.nio.file.Files.move;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.apache.commons.io.FileUtils.listFiles;
+import static org.apache.commons.io.FileUtils.moveFileToDirectory;
+import static org.rauschig.jarchivelib.ArchiveFormat.TAR;
+import static org.rauschig.jarchivelib.ArchiverFactory.createArchiver;
+import static org.rauschig.jarchivelib.CompressionType.BZIP2;
+import static org.rauschig.jarchivelib.CompressionType.GZIP;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,23 +40,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.List;
+import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.commons.io.FileUtils;
-import org.rauschig.jarchivelib.ArchiveFormat;
 import org.rauschig.jarchivelib.Archiver;
-import org.rauschig.jarchivelib.ArchiverFactory;
-import org.rauschig.jarchivelib.CompressionType;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.io.Files;
 
 /**
  * Downloader class.
@@ -47,303 +57,284 @@ import com.google.common.io.Files;
  * @since 1.0.0
  */
 public class Downloader {
-	protected static final Logger log = LoggerFactory
-			.getLogger(Downloader.class);
 
-	private static final String HOME = "~";
+    final Logger log = getLogger(lookup().lookupClass());
 
-	public static final synchronized void download(URL url, String version,
-			String export, List<String> driverName) throws IOException {
-		File targetFile = new File(getTarget(version, url));
-		File binary = null;
+    DriverManagerType driverManagerType;
+    HttpClient httpClient;
+    Config config;
 
-		// Check if binary exists
-		boolean download = !targetFile.getParentFile().exists()
-				|| (targetFile.getParentFile().exists()
-						&& targetFile.getParentFile().list().length == 0)
-				|| WdmConfig.getBoolean("wdm.override");
+    public Downloader(DriverManagerType driverManagerType) {
+        this.driverManagerType = driverManagerType;
 
-		if (!download) {
-			// Check if existing binary is valid
-			Collection<File> listFiles = FileUtils
-					.listFiles(targetFile.getParentFile(), null, true);
-			for (File file : listFiles) {
-				for (String s : driverName) {
-					if (file.getName().startsWith(s) && file.canExecute()) {
-						binary = file;
-						log.debug(
-								"Using binary driver previously downloaded {}",
-								binary);
-						download = false;
-						break;
-					} else {
-						download = true;
-					}
-				}
-				if (!download) {
-					break;
-				}
-			}
-		}
+        WebDriverManager webDriverManager = WebDriverManager
+                .getInstance(driverManagerType);
+        config = webDriverManager.config();
+        httpClient = webDriverManager.getHttpClient();
+    }
 
-		if (download) {
-			log.info("Downloading {} to {}", url, targetFile);
-			URLConnection conn = url.openConnection();
-			conn.setRequestProperty("User-Agent", "Mozilla/5.0");
-			conn.addRequestProperty("Connection", "keep-alive");
-			conn.connect();
-			FileUtils.copyInputStreamToFile(conn.getInputStream(), targetFile);
+    public synchronized String download(URL url, String version,
+            String driverName) throws IOException, InterruptedException {
+        File targetFile = getTarget(version, url);
+        Optional<File> binary = checkBinary(driverName, targetFile);
+        if (!binary.isPresent()) {
+            binary = downloadAndExtract(url, targetFile);
+        }
+        return binary.get().toString();
+    }
 
-			if (!export.contains("edge")) {
-				binary = extract(targetFile, export);
-				targetFile.delete();
-			} else {
-				binary = targetFile;
-			}
+    public File getTarget(String version, URL url) {
+        log.trace("getTarget {} {}", version, url);
+        String zip = url.getFile().substring(url.getFile().lastIndexOf('/'));
 
-		}
-		if (export != null) {
-			BrowserManager.exportDriver(export, binary.toString());
-		}
+        int iFirst = zip.indexOf('_');
+        int iSecond = zip.indexOf('-');
+        int iLast = zip.length();
+        if (iFirst != zip.lastIndexOf('_')) {
+            iLast = zip.lastIndexOf('_');
+        } else if (iSecond != -1) {
+            iLast = iSecond;
+        }
 
-	}
+        String folder = zip.substring(0, iLast).replace(".zip", "")
+                .replace(".tar.bz2", "").replace(".tar.gz", "")
+                .replace(".msi", "").replace(".exe", "")
+                .replace("_", separator);
+        String path = config.isAvoidOutputTree() ? getTargetPath() + zip
+                : getTargetPath() + folder + separator + version + zip;
+        String target = WebDriverManager.getInstance(driverManagerType)
+                .preDownload(path, version);
 
-	public static final File extractMsi(File msi) throws IOException {
-		File tmpMsi = new File(Files.createTempDir().getAbsoluteFile()
-				+ File.separator + msi.getName());
-		Files.move(msi, tmpMsi);
-		log.trace("Temporal msi file: {}", tmpMsi);
+        log.trace("Target file for URL {} version {} = {}", url, version,
+                target);
 
-		Process process = Runtime.getRuntime()
-				.exec(new String[] { "msiexec", "/a", tmpMsi.toString(), "/qb",
-						"TARGETDIR=" + msi.getParent() });
-		try {
-			process.waitFor();
-		} catch (InterruptedException e) {
-			log.error("Exception waiting to msiexec to be finished", e);
-		} finally {
-			process.destroy();
-		}
+        return new File(target);
+    }
 
-		tmpMsi.delete();
+    public String getTargetPath() {
+        String targetPath = config.getTargetPath();
+        log.trace("Target path {}", targetPath);
 
-		Collection<File> listFiles = FileUtils.listFiles(
-				new File(msi.getParent()), new String[] { "exe" }, true);
-		return listFiles.iterator().next();
-	}
+        // Create repository folder if not exits
+        File repository = new File(targetPath);
+        if (!repository.exists()) {
+            repository.mkdirs();
+        }
+        return targetPath;
+    }
 
-	public static final File extract(File compressedFile, String export)
-			throws IOException {
-		log.trace("Compressed file {}", compressedFile);
+    private Optional<File> downloadAndExtract(URL url, File targetFile)
+            throws IOException, InterruptedException {
+        log.info("Downloading {}", url);
+        File targetFolder = targetFile.getParentFile();
+        File tempDir = createTempDirectory("").toFile();
+        File temporaryFile = new File(tempDir, targetFile.getName());
 
-		File file = null;
-		if (compressedFile.getName().toLowerCase().endsWith("tar.bz2")) {
-			file = unBZip2(compressedFile, export);
-		} else if (compressedFile.getName().toLowerCase().endsWith("gz")) {
-			file = unGzip(compressedFile);
-		} else {
+        log.trace("Target folder {} ... using temporal file {}", targetFolder,
+                temporaryFile);
+        copyInputStreamToFile(httpClient.execute(httpClient.createHttpGet(url))
+                .getEntity().getContent(), temporaryFile);
 
-			ZipFile zipFolder = new ZipFile(compressedFile);
-			Enumeration<?> enu = zipFolder.entries();
+        File extractedFile = extract(temporaryFile);
+        File resultingBinary = new File(targetFolder, extractedFile.getName());
+        boolean binaryExists = resultingBinary.exists();
 
-			while (enu.hasMoreElements()) {
-				ZipEntry zipEntry = (ZipEntry) enu.nextElement();
+        if (!binaryExists || config.isOverride()) {
+            if (binaryExists) {
+                log.info("Overriding former binary {}", resultingBinary);
+                deleteFile(resultingBinary);
+            }
+            moveFileToDirectory(extractedFile, targetFolder, true);
+        }
+        if (!config.isExecutable(resultingBinary)) {
+            setFileExecutable(resultingBinary);
+        }
+        deleteFolder(tempDir);
+        log.trace("Binary driver after extraction {}", resultingBinary);
 
-				String name = zipEntry.getName();
-				long size = zipEntry.getSize();
-				long compressedSize = zipEntry.getCompressedSize();
-				log.trace("Unzipping {} (size: {} KB, compressed size: {} KB)",
-						name, size, compressedSize);
+        return of(resultingBinary);
+    }
 
-				file = new File(
-						compressedFile.getParentFile() + File.separator + name);
-				if (!file.exists() || WdmConfig.getBoolean("wdm.override")) {
-					if (name.endsWith("/")) {
-						file.mkdirs();
-						continue;
-					}
+    private Optional<File> checkBinary(String driverName, File targetFile) {
+        File parentFolder = targetFile.getParentFile();
+        if (parentFolder.exists() && !config.isOverride()) {
+            // Check if binary exits in parent folder and it is valid
 
-					File parent = file.getParentFile();
-					if (parent != null) {
-						parent.mkdirs();
-					}
+            Collection<File> listFiles = listFiles(parentFolder, null, true);
+            for (File file : listFiles) {
+                if (file.getName().startsWith(driverName)
+                        && config.isExecutable(file)) {
+                    log.info("Using binary driver previously downloaded");
+                    return of(file);
+                }
+            }
+            log.trace("{} does not exist in cache", driverName);
+        }
+        return empty();
+    }
 
-					InputStream is = zipFolder.getInputStream(zipEntry);
-					FileOutputStream fos = new FileOutputStream(file);
-					byte[] bytes = new byte[1024];
-					int length;
-					while ((length = is.read(bytes)) >= 0) {
-						fos.write(bytes, 0, length);
-					}
-					is.close();
-					fos.close();
-					file.setExecutable(true);
-				} else {
-					log.debug(file + " already exists");
-				}
+    private File extract(File compressedFile)
+            throws IOException, InterruptedException {
+        String fileName = compressedFile.getName().toLowerCase();
 
-			}
-			zipFolder.close();
-		}
+        boolean extractFile = !fileName.endsWith("exe")
+                && !fileName.endsWith("jar");
+        if (extractFile) {
+            log.info("Extracting binary from compressed file {}", fileName);
+        }
+        if (fileName.endsWith("tar.bz2")) {
+            unBZip2(compressedFile);
+        } else if (fileName.endsWith("tar.gz")) {
+            unTarGz(compressedFile);
+        } else if (fileName.endsWith("gz")) {
+            unGzip(compressedFile);
+        } else if (fileName.endsWith("msi")) {
+            extractMsi(compressedFile);
+        } else if (fileName.endsWith("zip")) {
+            unZip(compressedFile);
+        }
 
-		file = checkPhantom(compressedFile, export);
+        if (extractFile) {
+            deleteFile(compressedFile);
+        }
 
-		log.trace("Resulting binary file {}", file.getAbsoluteFile());
-		return file.getAbsoluteFile();
-	}
+        File result = WebDriverManager.getInstance(driverManagerType)
+                .postDownload(compressedFile).getAbsoluteFile();
+        log.trace("Resulting binary file {}", result);
 
-	public static File unGzip(File archive) throws IOException {
+        return result;
+    }
 
-		log.trace("UnGzip {}", archive);
-		String fileName = archive.getName();
-		int iDash = fileName.indexOf("-");
-		if (iDash != -1) {
-			fileName = fileName.substring(0, iDash);
-		}
-		int iDot = fileName.indexOf(".");
-		if (iDot != -1) {
-			fileName = fileName.substring(0, iDot);
-		}
-		File target = new File(
-				archive.getParentFile() + File.separator + fileName);
+    private void unZip(File compressedFile) throws IOException {
+        File file = null;
+        try (ZipFile zipFolder = new ZipFile(compressedFile)) {
+            Enumeration<?> enu = zipFolder.entries();
 
-		try (GZIPInputStream in = new GZIPInputStream(
-				new FileInputStream(archive))) {
-			try (FileOutputStream out = new FileOutputStream(target)) {
-				for (int c = in.read(); c != -1; c = in.read()) {
-					out.write(c);
-				}
-			}
-		}
+            while (enu.hasMoreElements()) {
+                ZipEntry zipEntry = (ZipEntry) enu.nextElement();
 
-		if (!target.getName().toLowerCase().contains(".exe")
-				&& target.exists()) {
-			target.setExecutable(true);
-		}
+                String name = zipEntry.getName();
+                long size = zipEntry.getSize();
+                long compressedSize = zipEntry.getCompressedSize();
+                log.trace("Unzipping {} (size: {} KB, compressed size: {} KB)",
+                        name, size, compressedSize);
 
-		return target;
-	}
+                file = new File(compressedFile.getParentFile(), name);
+                if (!file.exists() || config.isOverride()) {
+                    if (name.endsWith("/")) {
+                        file.mkdirs();
+                        continue;
+                    }
 
-	public static File unBZip2(File archive, String export) throws IOException {
-		Archiver archiver = ArchiverFactory.createArchiver(ArchiveFormat.TAR,
-				CompressionType.BZIP2);
-		archiver.extract(archive, archive.getParentFile());
-		log.trace("Unbzip2 {}", archive);
-		File target = checkPhantom(archive, export);
+                    File parent = file.getParentFile();
+                    if (parent != null) {
+                        parent.mkdirs();
+                    }
 
-		return target;
-	}
+                    try (InputStream is = zipFolder.getInputStream(zipEntry)) {
+                        copyInputStreamToFile(is, file);
+                    }
+                    setFileExecutable(file);
+                } else {
+                    log.debug("{} already exists", file);
+                }
 
-	private static File checkPhantom(File archive, String export)
-			throws IOException {
-		File target = null;
-		String phantomName = "phantomjs";
-		if (export.contains(phantomName)) {
-			String fileNoExtension = archive.getName().replace(".tar.bz2", "")
-					.replace(".zip", "");
+            }
+        }
+    }
 
-			File phantomjs = null;
-			try {
-				phantomjs = new File(archive.getParentFile().getAbsolutePath()
-						+ File.separator + fileNoExtension + File.separator
-						+ "bin" + File.separator).listFiles()[0];
-			} catch (Exception e) {
-				String extension = IS_OS_WINDOWS ? ".exe" : "";
-				phantomjs = new File(archive.getParentFile().getAbsolutePath()
-						+ File.separator + fileNoExtension + File.separator
-						+ phantomName + extension);
-			}
+    private void unGzip(File archive) throws IOException {
+        log.trace("UnGzip {}", archive);
+        String fileName = archive.getName();
+        int iDash = fileName.indexOf('-');
+        if (iDash != -1) {
+            fileName = fileName.substring(0, iDash);
+        }
+        int iDot = fileName.indexOf('.');
+        if (iDot != -1) {
+            fileName = fileName.substring(0, iDot);
+        }
+        File target = new File(archive.getParentFile(), fileName);
 
-			target = new File(archive.getParentFile().getAbsolutePath()
-					+ File.separator + phantomjs.getName());
-			phantomjs.renameTo(target);
+        try (GZIPInputStream in = new GZIPInputStream(
+                new FileInputStream(archive))) {
+            try (FileOutputStream out = new FileOutputStream(target)) {
+                for (int c = in.read(); c != -1; c = in.read()) {
+                    out.write(c);
+                }
+            }
+        }
 
-			File delete = new File(archive.getParentFile().getAbsolutePath()
-					+ File.separator + fileNoExtension);
-			log.trace("Folder to be deleted: {}", delete);
-			FileUtils.deleteDirectory(delete);
-		} else {
-			File[] ls = archive.getParentFile().listFiles();
-			for (File f : ls) {
-				if (IS_OS_WINDOWS) {
-					if (f.getName().endsWith(".exe")) {
-						target = f;
-						break;
-					}
-				} else if (f.canExecute()) {
-					target = f;
-					break;
-				}
-			}
-		}
-		return target;
-	}
+        if (!target.getName().toLowerCase().contains(".exe")
+                && target.exists()) {
+            setFileExecutable(target);
+        }
+    }
 
-	public static final String getTarget(String version, URL url)
-			throws IOException {
+    private void unTarGz(File archive) throws IOException {
+        Archiver archiver = createArchiver(TAR, GZIP);
+        archiver.extract(archive, archive.getParentFile());
+        log.trace("unTarGz {}", archive);
+    }
 
-		log.trace("getTarget {} {}", version, url);
+    private void unBZip2(File archive) throws IOException {
+        Archiver archiver = createArchiver(TAR, BZIP2);
+        archiver.extract(archive, archive.getParentFile());
+        log.trace("Unbzip2 {}", archive);
+    }
 
-		String zip = url.getFile().substring(url.getFile().lastIndexOf("/"));
+    private void extractMsi(File msi) throws IOException, InterruptedException {
+        File tmpMsi = new File(
+                createTempDirectory("").toFile().getAbsoluteFile() + separator
+                        + msi.getName());
+        move(msi.toPath(), tmpMsi.toPath());
+        log.trace("Temporal msi file: {}", tmpMsi);
 
-		int iFirst = zip.indexOf("_");
-		int iSecond = zip.indexOf("-");
-		int iLast = iFirst != zip.lastIndexOf("_") ? zip.lastIndexOf("_")
-				: iSecond != -1 ? iSecond : zip.length();
-		String folder = zip.substring(0, iLast).replace(".zip", "")
-				.replace(".tar.bz2", "").replace(".tar.gz", "")
-				.replace(".msi", "").replace(".exe", "")
-				.replace("_", File.separator);
+        Process process = getRuntime().exec(new String[] { "msiexec", "/a",
+                tmpMsi.toString(), "/qb", "TARGETDIR=" + msi.getParent() });
+        try {
+            process.waitFor();
+        } finally {
+            process.destroy();
+        }
 
-		String target = getTargetPath() + folder + File.separator + version
-				+ zip;
+        deleteFolder(tmpMsi.getParentFile());
+    }
 
-		System.out.println(target);
+    protected void setFileExecutable(File file) {
+        log.trace("Setting file {} as executable", file);
+        if (!file.setExecutable(true)) {
+            log.warn("Error setting file {} as executable", file);
+        }
+    }
 
-		// Exception for PhantomJS
-		if (target.contains("phantomjs")) {
-			int iSeparator = target.indexOf(version) - 1;
-			int iDash = target.lastIndexOf(version) + version.length();
-			int iPoint = target.lastIndexOf(".tar") != -1
-					? target.lastIndexOf(".tar") : target.lastIndexOf(".zip");
-			target = target.substring(0, iSeparator + 1)
-					+ target.substring(iDash + 1, iPoint)
-					+ target.substring(iSeparator);
-		}
+    protected void renameFile(File from, File to) {
+        log.trace("Renaming file from {} to {}", from, to);
+        if (to.exists()) {
+            deleteFile(to);
+        }
+        if (!from.renameTo(to)) {
+            log.warn("Error renaming file from {} to {}", from, to);
+        }
+    }
 
-		// Exception for Marionette
-		else if (target.contains("wires") || target.contains("geckodriver")) {
-			int iSeparator = target.indexOf(version) - 1;
-			int iDash = target.lastIndexOf(version) + version.length();
-			int iPoint = target.lastIndexOf("tar.gz") != -1
-					? target.lastIndexOf(".tar.gz")
-					: target.lastIndexOf(".gz") != -1
-							? target.lastIndexOf(".gz")
-							: target.lastIndexOf(".zip");
-			target = target.substring(0, iSeparator + 1)
-					+ target.substring(iDash + 1, iPoint).toLowerCase()
-					+ target.substring(iSeparator);
-		}
+    protected void deleteFile(File file) {
+        log.trace("Deleting file {}", file);
+        try {
+            delete(file.toPath());
+        } catch (IOException e) {
+            throw new WebDriverManagerException(e);
+        }
+    }
 
-		log.trace("Target file for URL {} version {} = {}", url, version,
-				target);
-
-		return target;
-	}
-
-	public static String getTargetPath() {
-		String targetPath = WdmConfig.getString("wdm.targetPath");
-		if (targetPath.contains(HOME)) {
-			targetPath = targetPath.replace(HOME,
-					System.getProperty("user.home"));
-		}
-
-		// Create repository folder if not exits
-		File repository = new File(targetPath);
-		if (!repository.exists()) {
-			repository.mkdirs();
-		}
-		return targetPath;
-	}
+    protected void deleteFolder(File folder) {
+        assert folder.isDirectory();
+        log.trace("Deleting folder {}", folder);
+        try {
+            deleteDirectory(folder);
+        } catch (IOException e) {
+            throw new WebDriverManagerException(e);
+        }
+    }
 
 }

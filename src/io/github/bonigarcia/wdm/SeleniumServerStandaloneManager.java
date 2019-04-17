@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015 Boni Garcia (http://bonigarcia.github.io/)
+ * (C) Copyright 2018 Boni Garcia (http://bonigarcia.github.io/)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,40 +16,41 @@
  */
 package io.github.bonigarcia.wdm;
 
-import static io.github.bonigarcia.wdm.DriverManagerType.IEXPLORER;
+import static io.github.bonigarcia.wdm.DriverManagerType.SELENIUM_SERVER_STANDALONE;
 import static java.util.Optional.empty;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Manager for Internet Explorer.
+ * Manager for selenium-server-standalone.
  *
  * @author Boni Garcia (boni.gg@gmail.com)
- * @since 1.0.0
+ * @since 3.0.1
  */
-public class InternetExplorerDriverManager extends WebDriverManager {
+public class SeleniumServerStandaloneManager extends WebDriverManager {
 
     @Override
     protected DriverManagerType getDriverManagerType() {
-        return IEXPLORER;
+        return SELENIUM_SERVER_STANDALONE;
     }
 
     @Override
     protected String getDriverName() {
-        return "IEDriverServer";
+        return "selenium-server-standalone";
     }
 
     @Override
     protected String getDriverVersion() {
-        return config().getInternetExplorerDriverVersion();
+        return config().getSeleniumServerStandaloneVersion();
     }
 
     @Override
     protected URL getDriverUrl() {
-        return config().getInternetExplorerDriverUrl();
+        return config().getSeleniumServerStandaloneUrl();
     }
 
     @Override
@@ -59,27 +60,32 @@ public class InternetExplorerDriverManager extends WebDriverManager {
 
     @Override
     protected Optional<String> getExportParameter() {
-        return Optional.of(config().getInternetExplorerDriverExport());
+        return empty();
     }
 
     @Override
     protected void setDriverVersion(String version) {
-        config().setInternetExplorerDriverVersion(version);
+        config().setSeleniumServerStandaloneVersion(version);
     }
 
     @Override
     protected void setDriverUrl(URL url) {
-        config().setInternetExplorerDriverUrl(url);
+        config().setSeleniumServerStandaloneUrl(url);
     }
 
     @Override
-    protected List<URL> getDrivers() throws IOException {
-        return getDriversFromXml(getDriverUrl());
+    protected File postDownload(File archive) {
+        return archive;
     }
 
     @Override
     protected Optional<String> getBrowserVersion() {
         return empty();
+    }
+
+    @Override
+    protected List<URL> getDrivers() throws IOException {
+        return getDriversFromXml(getDriverUrl());
     }
 
 }

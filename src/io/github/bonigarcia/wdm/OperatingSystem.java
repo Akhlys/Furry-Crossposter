@@ -16,37 +16,12 @@
  */
 package io.github.bonigarcia.wdm;
 
-import java.util.List;
-
-import com.google.gson.annotations.SerializedName;
-import com.google.gson.internal.LinkedTreeMap;
-
 /**
- * Plain-Old Java Object to parse JSON GitHub API (e.g.
- * https://api.github.com/repos/operasoftware/operachromiumdriver/releases) by
- * means of GSON.
+ * Supported operative system enumeration.
  *
  * @author Boni Garcia (boni.gg@gmail.com)
  * @since 1.0.0
  */
-public class GitHubApi {
-
-    @SerializedName("tag_name")
-    private String tagName;
-
-    private String name;
-    private List<LinkedTreeMap<String, Object>> assets;
-
-    public String getTagName() {
-        return tagName;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<LinkedTreeMap<String, Object>> getAssets() {
-        return assets;
-    }
-
+public enum OperatingSystem {
+    WIN, LINUX, MAC
 }

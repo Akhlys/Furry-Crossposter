@@ -28,5 +28,8 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/Furry%20Crossposter/libs/forWebdrivermanager/commons-io-2.6-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="libs/forWebdrivermanager/javalin-2.8.0.jar"/>
+	<classpathentry kind="lib" path="libs/forWebdrivermanager/javax.servlet.jar"/>
+	<classpathentry kind="lib" path="libs/forWebdrivermanager/jsoup-1.11.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

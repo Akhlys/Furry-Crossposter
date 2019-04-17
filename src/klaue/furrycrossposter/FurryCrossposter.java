@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import io.github.bonigarcia.wdm.ChromeDriverManager;
+import io.github.bonigarcia.wdm.WebDriverManager;
 
 /**
  * the main and start class of furry crossposter
@@ -70,7 +71,7 @@ public class FurryCrossposter extends JFrame {
 		
 		// now that we have a working dir, download latest driver
 		System.setProperty("wdm.targetPath", workingDir.toString());
-		ChromeDriverManager.getInstance().setup();
+		WebDriverManager.chromedriver().setup();
 //		ChromeDriverManager.getInstance().setup(Architecture
 //				.valueOf("x" + System.getProperty("sun.arch.data.model")), "2.38");
 		

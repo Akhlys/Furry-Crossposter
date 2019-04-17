@@ -1,31 +1,28 @@
 /*
  * (C) Copyright 2015 Boni Garcia (http://bonigarcia.github.io/)
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 package io.github.bonigarcia.wdm;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import static io.github.bonigarcia.wdm.DriverManagerType.OPERA;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.internal.LinkedTreeMap;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Manager for Opera.
@@ -33,85 +30,114 @@ import com.google.gson.internal.LinkedTreeMap;
  * @author Boni Garcia (boni.gg@gmail.com)
  * @since 1.0.0
  */
-public class OperaDriverManager extends BrowserManager {
+public class OperaDriverManager extends WebDriverManager {
 
-	private static OperaDriverManager instance;
+    @Override
+    protected DriverManagerType getDriverManagerType() {
+        return OPERA;
+    }
 
-	public OperaDriverManager() {
-	}
+    @Override
+    protected String getDriverName() {
+        return "operadriver";
+    }
 
-	public static synchronized OperaDriverManager getInstance() {
-		if (instance == null) {
-			instance = new OperaDriverManager();
-		}
-		return instance;
-	}
+    @Override
+    protected String getDriverVersion() {
+        return config().getOperaDriverVersion();
+    }
 
-	@Override
-	public List<URL> getDrivers() throws IOException {
-		URL driverUrl = getDriverUrl();
-		String driverVersion = versionToDownload;
+    @Override
+    protected URL getDriverUrl() {
+        return getDriverUrlCkeckingMirror(config().getOperaDriverUrl());
+    }
 
-		BufferedReader reader = new BufferedReader(
-				new InputStreamReader(openGitHubConnection(driverUrl)));
+    @Override
+    protected Optional<URL> getMirrorUrl() {
+        return Optional.of(config().getOperaDriverMirrorUrl());
+    }
 
-		GsonBuilder gsonBuilder = new GsonBuilder();
-		Gson gson = gsonBuilder.create();
-		GitHubApi[] releaseArray = gson.fromJson(reader, GitHubApi[].class);
-		GitHubApi release;
-		if (driverVersion == null || driverVersion.isEmpty() || driverVersion
-				.equalsIgnoreCase(DriverVersion.LATEST.name())) {
-			log.debug("Connecting to {} to check latest OperaDriver release",
-					driverUrl);
-			driverVersion = releaseArray[0].getName();
-			log.debug("Latest driver version: {}", driverVersion);
-			release = releaseArray[0];
-		} else {
-			release = getVersion(releaseArray, driverVersion);
-		}
-		if (release == null) {
-			throw new RuntimeException("Version " + driverVersion
-					+ " is not available for OperaDriver");
-		}
+    @Override
+    protected Optional<String> getExportParameter() {
+        return Optional.of(config().getOperaDriverExport());
+    }
 
-		List<LinkedTreeMap<String, Object>> assets = release.getAssets();
-		List<URL> urls = new ArrayList<>();
-		for (LinkedTreeMap<String, Object> asset : assets) {
-			urls.add(new URL(asset.get("browser_download_url").toString()));
-		}
+    @Override
+    protected void setDriverVersion(String version) {
+        config().setOperaDriverVersion(version);
+    }
 
-		reader.close();
-		return urls;
-	}
+    @Override
+    protected void setDriverUrl(URL url) {
+        config().setOperaDriverUrl(url);
+    }
 
-	@Override
-	protected String getExportParameter() {
-		return WdmConfig.getString("wdm.operaDriverExport");
-	}
+    @Override
+    protected String getCurrentVersion(URL url, String driverName) {
+        if (isUsingTaobaoMirror()) {
+            int i = url.getFile().lastIndexOf(SLASH);
+            int j = url.getFile().substring(0, i).lastIndexOf(SLASH) + 1;
+            return url.getFile().substring(j, i);
+        } else {
+            return url.getFile().substring(
+                    url.getFile().indexOf(SLASH + "v") + 2,
+                    url.getFile().lastIndexOf(SLASH));
+        }
+    }
 
-	private GitHubApi getVersion(GitHubApi[] releaseArray, String version) {
-		GitHubApi out = null;
-		for (GitHubApi release : releaseArray) {
-			if (release.getName().equalsIgnoreCase(version)) {
-				out = release;
-				break;
-			}
-		}
-		return out;
-	}
+    @Override
+    protected List<URL> getDrivers() throws IOException {
+        return getDriversFromGitHub();
+    }
 
-	@Override
-	protected List<String> getDriverName() {
-		return Arrays.asList("operadriver");
-	}
+    @Override
+    protected File postDownload(File archive) {
+        log.trace("Post processing for Opera: {}", archive);
 
-	@Override
-	protected String getDriverVersion() {
-		return WdmConfig.getString("wdm.operaDriverVersion");
-	}
+        File extractFolder = archive.getParentFile()
+                .listFiles(getFolderFilter())[0];
+        if (!extractFolder.isFile()) {
+            File target;
+            try {
+                log.trace("Opera extract folder (to be deleted): {}",
+                        extractFolder);
+                File[] listFiles = extractFolder.listFiles();
+                int i = 0;
+                File operadriver;
+                boolean isOperaDriver;
+                do {
+                    if (i >= listFiles.length) {
+                        throw new WebDriverManagerException(
+                                "Driver binary for Opera not found in zip file");
+                    }
+                    operadriver = listFiles[i];
+                    isOperaDriver = config().isExecutable(operadriver)
+                            && operadriver.getName().contains(getDriverName());
+                    i++;
+                    log.trace("{} is valid: {}", operadriver, isOperaDriver);
+                } while (!isOperaDriver);
+                log.info("Operadriver binary: {}", operadriver);
 
-	@Override
-	protected URL getDriverUrl() throws MalformedURLException {
-		return WdmConfig.getUrl("wdm.operaDriverUrl");
-	}
+                target = new File(archive.getParentFile().getAbsolutePath(),
+                        operadriver.getName());
+                log.trace("Operadriver target: {}", target);
+
+                downloader.renameFile(operadriver, target);
+            } finally {
+                downloader.deleteFolder(extractFolder);
+            }
+            return target;
+        } else {
+            return super.postDownload(archive);
+        }
+    }
+
+    @Override
+    protected Optional<String> getBrowserVersion() {
+        return getDefaultBrowserVersion("PROGRAMFILES",
+                "\\\\Opera\\\\launcher.exe", "opera",
+                "/Applications/Opera.app/Contents/MacOS/Opera", "--version",
+                "");
+    }
+
 }

@@ -10,6 +10,14 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
 import klaue.furrycrossposter.FurryCrossposter;
 import klaue.furrycrossposter.ImageInfo;
 import klaue.furrycrossposter.ImageInfo.Gender;
@@ -17,13 +25,6 @@ import klaue.furrycrossposter.ImageInfo.RatingSexual;
 import klaue.furrycrossposter.ImageInfo.RatingViolence;
 import klaue.furrycrossposter.ImageInfo.Type;
 import klaue.furrycrossposter.ImageTools;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class FurAffinity extends Site {
 	private WebDriver driver;
@@ -92,6 +93,10 @@ public class FurAffinity extends Site {
 			this.driver.findElement(By.name("thumbnail")).sendKeys(thumbPath.toString());
 		}
 		this.driver.findElement(By.xpath("//input[@value='Next']")).click();
+		
+		// remove cookie overlay that may obscure clicks
+		JavascriptExecutor js = (JavascriptExecutor)this.driver;
+		js.executeScript("var cookiediv = document.getElementById('cookie-notification'); if (cookiediv) cookiediv.remove();");
 		
 		this.driver.findElement(By.name("title")).sendKeys(imageInfo.getTitle());
 		this.driver.findElement(By.id("JSMessage")).sendKeys(imageInfo.getDescription());

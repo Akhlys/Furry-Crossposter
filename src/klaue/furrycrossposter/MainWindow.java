@@ -128,7 +128,7 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		this.fileChooser.setAccessory(new ImagePreview(this.fileChooser));
 		//fileChooser.setFileView(new ImageFileView());
 		
-		this.setTitle("Furry Crossposter by Double Helix Industries - 1.5");
+		this.setTitle("Furry Crossposter by Double Helix Industries - 1.7");
 		this.setSize(900, 768);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

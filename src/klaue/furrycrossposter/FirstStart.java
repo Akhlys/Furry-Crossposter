@@ -8,13 +8,13 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -31,19 +31,18 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * this class will be called if no user data was found, it is responsible to get the firefox profile and tags from e621
@@ -157,10 +156,10 @@ public class FirstStart extends JDialog implements WindowListener {
 							for (int i = 1; i <= 100; ++i) {
 								downloadTags.setText("Downloading page " + i + ", please wait..");
 								System.out.println("Downloading page " + i);
-								ArrayList<Tag> tags = downloadTag(i, FirstStart.this.workingDirectory);
+								ArrayList<Tag> tags = downloadTag(i, FirstStart.this.workingDirectory, MIN_TAGCOUNT);
 								FirstStart.this.imageTags.addAll(tags);
-								if (tags.get(tags.size() - 1).getCount() < MIN_TAGCOUNT) {
-									// it doesn't matter if the current list of tags contains some with less than 10
+								if (tags.isEmpty() || tags.get(tags.size() - 1).getCount() < MIN_TAGCOUNT) {
+									// should have been excluded anyway
 									break;
 								}
 								
@@ -238,49 +237,45 @@ public class FirstStart extends JDialog implements WindowListener {
 		this.setVisible(true);
 	}
 	
-	ArrayList<Tag> downloadTag(int page, Path workingDir) throws ParserConfigurationException, SAXException, IOException {
-		Path xml = workingDir.resolve("tag.xml");
-		if (Files.exists(xml)) Files.delete(xml);
+	ArrayList<Tag> downloadTag(int page, Path workingDir, int minTagCount) throws ParserConfigurationException, SAXException, IOException {
+		Path json = workingDir.resolve("tag.json");
+		if (Files.exists(json)) Files.delete(json);
 		
-		URL website = new URL("https://e621.net/tag/index.xml?limit=1000&order=count&page=" + page);
+		URL website = new URL("https://e621.net/tags.json?limit=1000&search[order]=count&page=" + page);
 		URLConnection c = website.openConnection();
-		c.setRequestProperty("User-Agent", "FurryCrossposter");
-		ReadableByteChannel rbc = Channels.newChannel(c.getInputStream());
-		try (FileOutputStream fos = new FileOutputStream(xml.toString())) {
-			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-		}
-	    
+		c.setRequestProperty("User-Agent", "FurryCrossposter (by Klaue on e621)");
+		InputStream is = c.getInputStream();
+		Files.copy(is, json);
+	    is.close();
+		
 	    // parse
-  		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-  		DocumentBuilder db = dbf.newDocumentBuilder();
-  		Document dom = db.parse(xml.toFile());//"https://e621.net/tag/index.xml?limit=1000&order=count&page=" + page);
-  		Element docEle = dom.getDocumentElement();
-  		NodeList nl = docEle.getElementsByTagName("tag");
-  		
   		ArrayList<Tag> tagList = new ArrayList<>();
-  		if(nl != null && nl.getLength() > 0) {
-			for(int i = 0 ; i < nl.getLength();i++) {
-				Element tagEl = (Element)nl.item(i);
-				
-
-				Node nameNode = tagEl.getElementsByTagName("name").item(0);
-				Node typeNode = tagEl.getElementsByTagName("type").item(0);
-				Node countNode = tagEl.getElementsByTagName("count").item(0);
-				Node idNode = tagEl.getElementsByTagName("id").item(0);
-				
-				// only save tag if all fields are set. Tag with ID 148522 for example has no name
-				if (!nameNode.hasChildNodes() || !typeNode.hasChildNodes() || !countNode.hasChildNodes()
-						|| !idNode.hasChildNodes()) continue;
-				
-				String name = nameNode.getFirstChild().getNodeValue();
-				int type = Integer.parseInt(typeNode.getFirstChild().getNodeValue());
-				int count = Integer.parseInt(countNode.getFirstChild().getNodeValue());
-				int id = Integer.parseInt(idNode.getFirstChild().getNodeValue());
-				tagList.add(new Tag(name, type, count, id));
-			}
+  		FileReader reader = new FileReader(json.toFile());
+		JsonElement rootElem = new JsonParser().parse(reader);
+		reader.close();
+		JsonArray rootArr = rootElem.getAsJsonArray();
+		for (JsonElement elem : rootArr) {
+			JsonObject curObj = elem.getAsJsonObject();
+			//{"id":12054,"name":"mammal","post_count":1468092,"related_tags":"mammal 300 anthro 203 male 176 female 174 hi_res 154 clothing 148 solo 127 hair 121 fur 119 breasts 113 canid 112 canine 112 duo 107 penis 104 nipples 90 genitals 89 bodily_fluids 83 clothed 81 nude 80 blush 74 sex 74 simple_background 72 erection 68 video_games 67 felid 65","related_tags_updated_at":"2020-05-05T01:15:34.306-04:00","category":5,"is_locked":false,"created_at":"2020-03-05T05:49:37.994-05:00","updated_at":"2020-05-05T01:15:34.306-04:00"}
+			JsonElement nameEle = curObj.get("name");
+			JsonElement typeEle = curObj.get("category");
+			JsonElement countEle = curObj.get("post_count");
+			JsonElement idEle = curObj.get("id");
+			
+			// only save tag if all fields are set. Tag with ID 148522 for example has no name
+			if (nameEle == null || typeEle == null || countEle == null || idEle == null) continue;
+			
+			String name = nameEle.getAsString();
+			int type = typeEle.getAsInt();
+			int count = countEle.getAsInt();
+			int id = idEle.getAsInt();
+			
+			if (minTagCount > count) continue;
+			
+			tagList.add(new Tag(name, type, count, id));
 		}
   		
-  		Files.delete(xml);
+  		Files.delete(json);
   		
 		return tagList;
 	}

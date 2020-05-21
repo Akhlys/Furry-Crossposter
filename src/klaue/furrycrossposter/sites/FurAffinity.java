@@ -78,39 +78,56 @@ public class FurAffinity extends Site {
 
 		this.driver.get("https://www.furaffinity.net/login/");
 		
+		removeMobileStuff();
+		
 		// wait for login
 		WebDriverWait wait = new WebDriverWait(this.driver, 60);
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("my-username")));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("my-username")));//By.xpath("(//*[@id='my-username'])")));//By.id("my-username")));
 		
 		this.driver.findElement(By.xpath("//a[@href='/submit/']")).click();
 		
+		removeMobileStuff();
 		// default, "Artwork", is selected, just continue
-		this.driver.findElement(By.xpath("//input[@value='Next Step']")).click();
+		this.driver.findElement(By.xpath("//button[@value='Next']")).click();
+		removeMobileStuff();
 		
 		this.driver.findElement(By.name("submission")).sendKeys(imagePath.toString());
 		
 		if (thumbPath != null) {
 			this.driver.findElement(By.name("thumbnail")).sendKeys(thumbPath.toString());
 		}
-		this.driver.findElement(By.xpath("//input[@value='Next']")).click();
+		this.driver.findElement(By.xpath("//button[@value='Next Step']")).click();
+		removeMobileStuff();
 		
 		// remove cookie overlay that may obscure clicks
 		JavascriptExecutor js = (JavascriptExecutor)this.driver;
 		js.executeScript("var cookiediv = document.getElementById('cookie-notification'); if (cookiediv) cookiediv.remove();");
 		
 		this.driver.findElement(By.name("title")).sendKeys(imageInfo.getTitle());
-		this.driver.findElement(By.id("JSMessage")).sendKeys(imageInfo.getDescription());
+		this.driver.findElement(By.id("message")).sendKeys(imageInfo.getDescription());
 		
 		// rating
-		if (imageInfo.getSexualRating() == RatingSexual.NUDITY_EX
-				|| imageInfo.getViolenceRating() == RatingViolence.VIOLENCE_EX) {
-			this.driver.findElement(By.id("rating-type-adult")).click();
-		} else if (imageInfo.getSexualRating() == RatingSexual.NUDITY_MOD
-				|| imageInfo.getViolenceRating() == RatingViolence.VIOLENCE_MOD) {
-			this.driver.findElement(By.id("rating-type-mature")).click();
-		} else {
-			this.driver.findElement(By.id("rating-type-general")).click();
+		List<WebElement> ratingElements = this.driver.findElements(By.name("rating"));
+		for (WebElement ratingElement : ratingElements) {
+			if (ratingElement.getAttribute("value").equals("1") && imageInfo.getSexualRating() == RatingSexual.NUDITY_EX
+					|| imageInfo.getViolenceRating() == RatingViolence.VIOLENCE_EX) {
+				ratingElement.click();
+			} else if(ratingElement.getAttribute("value").equals("2") && imageInfo.getSexualRating() == RatingSexual.NUDITY_MOD
+					|| imageInfo.getViolenceRating() == RatingViolence.VIOLENCE_MOD) {
+				ratingElement.click();
+			} else if(ratingElement.getAttribute("value").equals("0")) {
+				ratingElement.click();
+			}
 		}
+//		if (imageInfo.getSexualRating() == RatingSexual.NUDITY_EX
+//				|| imageInfo.getViolenceRating() == RatingViolence.VIOLENCE_EX) {
+//			this.driver.findElement(By.id("rating-type-adult")).click();
+//		} else if (imageInfo.getSexualRating() == RatingSexual.NUDITY_MOD
+//				|| imageInfo.getViolenceRating() == RatingViolence.VIOLENCE_MOD) {
+//			this.driver.findElement(By.id("rating-type-mature")).click();
+//		} else {
+//			this.driver.findElement(By.id("rating-type-general")).click();
+//		}
 		
 		if (imageInfo.getType() == Type.TRADITIONAL) {
 			new Select(this.driver.findElement(By.name("cat"))).selectByVisibleText("Artwork (Traditional)");
@@ -230,7 +247,7 @@ public class FurAffinity extends Site {
 			}
 		}
 		
-		this.driver.findElement(By.xpath("//input[@value='Finalize']")).click();
+		this.driver.findElement(By.xpath("//input[@value='Finalize ']")).click();
 		
 		showFinishMessage(this.driver);
 		
@@ -245,6 +262,12 @@ public class FurAffinity extends Site {
 		
 		//driver.quit();
 		return true;
+	}
+	
+	private void removeMobileStuff() {
+		JavascriptExecutor js = (JavascriptExecutor)this.driver;
+		js.executeScript("var mobileElements = document.getElementsByClassName('hideondesktop'); if (mobileElements) for (let elem of mobileElements) elem.remove();");
+		js.executeScript("var mobileElements = document.getElementsByClassName('mobile-navigation'); if (mobileElements) for (let elem of mobileElements) elem.remove();");
 	}
 
 	@Override

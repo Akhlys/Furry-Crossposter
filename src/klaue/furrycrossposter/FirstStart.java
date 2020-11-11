@@ -31,13 +31,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.xml.sax.SAXException;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -237,22 +235,23 @@ public class FirstStart extends JDialog implements WindowListener {
 		this.setVisible(true);
 	}
 	
-	ArrayList<Tag> downloadTag(int page, Path workingDir, int minTagCount) throws ParserConfigurationException, SAXException, IOException {
+	ArrayList<Tag> downloadTag(int page, Path workingDir, int minTagCount) throws IOException {
 		Path json = workingDir.resolve("tag.json");
 		if (Files.exists(json)) Files.delete(json);
 		
 		URL website = new URL("https://e621.net/tags.json?limit=1000&search[order]=count&page=" + page);
 		URLConnection c = website.openConnection();
 		c.setRequestProperty("User-Agent", "FurryCrossposter (by Klaue on e621)");
-		InputStream is = c.getInputStream();
-		Files.copy(is, json);
-	    is.close();
+		try (InputStream is = c.getInputStream()) {
+			Files.copy(is, json);
+		}
 		
 	    // parse
   		ArrayList<Tag> tagList = new ArrayList<>();
-  		FileReader reader = new FileReader(json.toFile());
-		JsonElement rootElem = new JsonParser().parse(reader);
-		reader.close();
+  		JsonElement rootElem = null;
+  		try(FileReader reader = new FileReader(json.toFile())) {
+  			rootElem = new JsonParser().parse(reader);
+  		}
 		JsonArray rootArr = rootElem.getAsJsonArray();
 		for (JsonElement elem : rootArr) {
 			JsonObject curObj = elem.getAsJsonObject();

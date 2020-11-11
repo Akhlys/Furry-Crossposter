@@ -14,7 +14,6 @@ import java.util.TreeSet;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import io.github.bonigarcia.wdm.ChromeDriverManager;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 /**

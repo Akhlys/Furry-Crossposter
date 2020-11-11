@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import klaue.furrycrossposter.sites.FurryNetwork;
 import klaue.furrycrossposter.sites.Site;
 
 public class UploadDialog extends JDialog implements ActionListener {
@@ -132,7 +133,9 @@ public class UploadDialog extends JDialog implements ActionListener {
 			e1.printStackTrace();
 			return;
 		}
-		
+		if (site instanceof FurryNetwork) {
+			JOptionPane.showMessageDialog(this, "<html><body>" + site.getName() + " has a history of giving errors. IF it stops in the middle, close browser and try again. If it stops just short of submitting, set it to public ans submit in browser. Sorry for the hassle.</body></html>", "Furry Crossposter", JOptionPane.WARNING_MESSAGE);
+		}
 		try {
 			boolean worked = site.doUpload(this.imageInfo);
 			if (!worked) {

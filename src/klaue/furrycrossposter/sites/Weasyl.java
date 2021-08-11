@@ -118,7 +118,7 @@ public class Weasyl extends Site {
 		if (imageInfo.hasNoNotification()) this.driver.findElement(By.id("nonotifcation")).click();
 		
 		
-		this.driver.findElement(By.cssSelector("ul.listbuilder")).click();
+		this.driver.findElement(By.name("tags")).click();
 		this.driver.switchTo().activeElement().sendKeys(getTags(imageInfo) + " ");
 
 		this.driver.findElement(By.cssSelector("button.button.positive")).click();

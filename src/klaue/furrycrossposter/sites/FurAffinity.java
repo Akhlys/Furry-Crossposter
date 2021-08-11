@@ -87,16 +87,16 @@ public class FurAffinity extends Site {
 		this.driver.findElement(By.xpath("//a[@href='/submit/']")).click();
 		
 		removeMobileStuff();
-		// default, "Artwork", is selected, just continue
-		this.driver.findElement(By.xpath("//button[@value='Next']")).click();
-		removeMobileStuff();
+//		// default, "Artwork", is selected, just continue
+//		this.driver.findElement(By.xpath("//button[@value='Next']")).click();
+//		removeMobileStuff();
 		
 		this.driver.findElement(By.name("submission")).sendKeys(imagePath.toString());
 		
 		if (thumbPath != null) {
 			this.driver.findElement(By.name("thumbnail")).sendKeys(thumbPath.toString());
 		}
-		this.driver.findElement(By.xpath("//button[@value='Next Step']")).click();
+		this.driver.findElement(By.xpath("//button[contains(.,'Upload')]")).click();
 		removeMobileStuff();
 		
 		// remove cookie overlay that may obscure clicks
@@ -231,18 +231,20 @@ public class FurAffinity extends Site {
 		
 		
 		// folders
-		List<WebElement> fieldsets = this.driver.findElements(By.tagName("fieldset"));
-		for (WebElement fieldset : fieldsets) {
-			// folder groups
-			String folderName = fieldset.findElement(By.tagName("legend")).getText();
-			folderName = folderName + "_-_";
-			
-			List<WebElement> folderDivs = fieldset.findElements(By.className("folder_name"));
-			for (WebElement folderDiv : folderDivs) {
-				folderName += folderDiv.findElement(By.tagName("label")).getText();
-				folderName = folderName.toLowerCase().replace(" ", "_");
-				if (imageInfo.getFolders().contains(folderName)) {
-					folderDiv.findElement(By.tagName("input")).click();
+		if (!imageInfo.getFolders().isEmpty()) {
+			List<WebElement> fieldsets = this.driver.findElements(By.tagName("fieldset"));
+			for (WebElement fieldset : fieldsets) {
+				// folder groups
+				String folderName = fieldset.findElement(By.tagName("legend")).getText();
+				folderName = folderName + "_-_";
+				
+				List<WebElement> folderDivs = fieldset.findElements(By.className("folder_name"));
+				for (WebElement folderDiv : folderDivs) {
+					folderName += folderDiv.findElement(By.tagName("label")).getText();
+					folderName = folderName.toLowerCase().replace(" ", "_");
+					if (imageInfo.getFolders().contains(folderName)) {
+						folderDiv.findElement(By.tagName("input")).click();
+					}
 				}
 			}
 		}

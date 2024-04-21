@@ -3,9 +3,16 @@ package klaue.furrycrossposter.sites;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import klaue.furrycrossposter.FurryCrossposter;
 import klaue.furrycrossposter.ImageInfo;
@@ -13,12 +20,6 @@ import klaue.furrycrossposter.ImageInfo.Gender;
 import klaue.furrycrossposter.ImageInfo.RatingSexual;
 import klaue.furrycrossposter.ImageInfo.RatingViolence;
 import klaue.furrycrossposter.Tag;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class E621 extends Site {
 	private WebDriver driver;
@@ -32,7 +33,7 @@ public class E621 extends Site {
 		
 		this.driver.get("https://e621.net/user/login");
 		
-		WebDriverWait wait = new WebDriverWait(this.driver, 60);
+		WebDriverWait wait = new WebDriverWait(this.driver, Duration.ofSeconds(60));
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@href='/user/edit']")));
 		
 		this.driver.get("https://e621.net/post/upload");

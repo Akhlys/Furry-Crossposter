@@ -10,11 +10,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -85,6 +85,7 @@ public abstract class Site {
 			options.addArguments("user-data-dir=" + profileDir);
 			options.addArguments("profile-directory=" + FurryCrossposter.chromeProfile.getFileName().toString());
 			options.addArguments("--start-maximized");
+			options.addArguments("--remote-allow-origins=*");
 			
 			// try to enable password saving, even tho it seems to be disabled now and at
 			// least on linux this isn't working
@@ -93,8 +94,9 @@ public abstract class Site {
 			prefs.put("profile.password_manager_enabled", Boolean.valueOf(true));
 			options.setExperimentalOption("prefs", prefs);
 		}
+		
 		WebDriver driver = new ChromeDriver(options);
-		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
 		return driver;
 	}
 	

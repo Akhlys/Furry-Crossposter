@@ -3,6 +3,7 @@ package klaue.furrycrossposter.sites;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -14,8 +15,6 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.internal.ElementScrollBehavior;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -34,13 +33,13 @@ public class DeviantArt extends Site {
 		Path imagePath = imageInfo.getImagePath();
 		
 		ChromeOptions options = new ChromeOptions();
-		options.setCapability(CapabilityType.ELEMENT_SCROLL_BEHAVIOR, ElementScrollBehavior.BOTTOM);
+		//options.setCapability(CapabilityType.ELEMENT_SCROLL_BEHAVIOR, ElementScrollBehavior.BOTTOM);
 		this.driver = getDriver(options);
 		
 		
 		this.driver.get("https://www.deviantart.com/users/login");
 		
-		WebDriverWait wait = new WebDriverWait(this.driver, 60);
+		WebDriverWait wait = new WebDriverWait(this.driver, Duration.ofSeconds(60));
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("oh-menu-deviant")));
 		
 		// open iframe content

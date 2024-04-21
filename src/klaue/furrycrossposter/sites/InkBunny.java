@@ -4,19 +4,12 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
-
-import klaue.furrycrossposter.FurryCrossposter;
-import klaue.furrycrossposter.ImageInfo;
-import klaue.furrycrossposter.ImageInfo.Gender;
-import klaue.furrycrossposter.ImageInfo.RatingSexual;
-import klaue.furrycrossposter.ImageInfo.RatingViolence;
-import klaue.furrycrossposter.ImageTools;
-import klaue.furrycrossposter.Tag;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -25,6 +18,14 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import klaue.furrycrossposter.FurryCrossposter;
+import klaue.furrycrossposter.ImageInfo;
+import klaue.furrycrossposter.ImageInfo.Gender;
+import klaue.furrycrossposter.ImageInfo.RatingSexual;
+import klaue.furrycrossposter.ImageInfo.RatingViolence;
+import klaue.furrycrossposter.ImageTools;
+import klaue.furrycrossposter.Tag;
 
 public class InkBunny extends Site {
 	private WebDriver driver;
@@ -78,7 +79,7 @@ public class InkBunny extends Site {
 		this.driver.get("https://inkbunny.net/login.php");
 		
 		// wait for login
-		WebDriverWait wait = new WebDriverWait(this.driver, 60);
+		WebDriverWait wait = new WebDriverWait(this.driver, Duration.ofSeconds(60));
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("privatemessage_notification")));
 		
 		// go to upload (menu will only show on hover)
@@ -95,7 +96,7 @@ public class InkBunny extends Site {
 			this.driver.findElement(By.name("uploadedthumbnail[]")).sendKeys(thumbPath.toString());
 		}
 		this.driver.findElement(By.xpath("//input[@value='Upload']")).click();
-		wait = new WebDriverWait(this.driver, 120);
+		wait = new WebDriverWait(this.driver, Duration.ofSeconds(120));
 		WebElement elem = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@value='Next >']")));
 		elem.click();
 		

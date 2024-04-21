@@ -8,6 +8,9 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -19,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -73,6 +77,8 @@ import layout.TableLayoutConstants;
 import layout.TableLayoutConstraints;
 
 public class MainWindow extends JFrame implements ActionListener, DocumentListener, ChangeListener {
+	private static final String windowTitle = "Furry Crossposter by Double Helix Industries - 1.23";
+	
 	private static final long serialVersionUID = 5580717767809657474L;
 	private static ArrayList<Site> pages = new ArrayList<>();
 	static {
@@ -128,7 +134,7 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		this.fileChooser.setAccessory(new ImagePreview(this.fileChooser));
 		//fileChooser.setFileView(new ImageFileView());
 		
-		this.setTitle("Furry Crossposter by Double Helix Industries - 1.8");
+		this.setTitle(windowTitle);
 		this.setSize(900, 768);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -199,6 +205,26 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		imagesPanel.add(getSeparator(SwingConstants.VERTICAL));
 		imagesPanel.add(Box.createHorizontalStrut(10));
 		////////////////
+		
+		// add drag & drop
+		@SuppressWarnings("serial")
+		DropTarget imageDropTarget = new ImageDropTarget(imageFilter, this) {
+			@Override
+			public void fileAccepted(File f) {
+				openImage(false, f);
+			}
+		};
+		imagesPanel.setDropTarget(imageDropTarget);
+		
+		@SuppressWarnings("serial")
+		DropTarget thumbDropTarget = new ImageDropTarget(imageFilter, this) {
+			@Override
+			public void fileAccepted(File f) {
+				openImage(true, f);
+			}
+		};
+		thumbImagePanel.setDropTarget(thumbDropTarget);
+		
 		
 		// general image info
 		this.typeBox.setModel(new DefaultComboBoxModel<>(ImageInfo.Type.values()));
@@ -433,9 +459,9 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		if (arg0.getSource() == this.btnSelMainImage) {
-			openImage(false);
+			openImage(false, null);
 		} else if (arg0.getSource() == this.btnSelThumbImage) {
-			openImage(true);
+			openImage(true, null);
 		} else if (arg0.getSource() == this.typeBox) {
 			ImageInfo.Type type = (ImageInfo.Type)this.typeBox.getSelectedItem();
 			this.imageInfo.setType(type);
@@ -619,14 +645,16 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		pane.getDocument().addDocumentListener(this);
 	}
 	
-	private void openImage(boolean thumb) {
+	void openImage(boolean thumb, File imageFile) {
 		JLabel labelToDisplay = thumb ? this.thumbLabel : this.imageLabel;
 		
-		if (this.fileChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
-			return;
+		if (imageFile == null) {
+			if (this.fileChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
+				return;
+			}
+			
+			imageFile = this.fileChooser.getSelectedFile();
 		}
-		
-		File imageFile = this.fileChooser.getSelectedFile();
 		BufferedImage image = null;
 		try {
 			image = ImageTools.getResizedInstance(labelToDisplay.getPreferredSize().width, labelToDisplay.getPreferredSize().height, imageFile);

@@ -139,7 +139,7 @@ public class UploadDialog extends JDialog implements ActionListener {
 		try {
 			boolean worked = site.doUpload(this.imageInfo);
 			if (!worked) {
-				JOptionPane.showMessageDialog(this, "Errors while uploading to " + site.getName(), "Furry Crossposter", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Errors while uploading to " + site.getName() + "\nIf it's a timeout, maybe you took too long to login, just try again", "Furry Crossposter", JOptionPane.ERROR_MESSAGE);
 			}
 		} catch (Exception e1) {
 			e1.printStackTrace();

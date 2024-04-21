@@ -4,18 +4,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
 
 import javax.swing.JOptionPane;
-
-import klaue.furrycrossposter.FurryCrossposter;
-import klaue.furrycrossposter.ImageInfo;
-import klaue.furrycrossposter.ImageInfo.Gender;
-import klaue.furrycrossposter.ImageInfo.RatingSexual;
-import klaue.furrycrossposter.ImageInfo.RatingViolence;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -24,6 +19,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import klaue.furrycrossposter.FurryCrossposter;
+import klaue.furrycrossposter.ImageInfo;
+import klaue.furrycrossposter.ImageInfo.Gender;
+import klaue.furrycrossposter.ImageInfo.RatingSexual;
+import klaue.furrycrossposter.ImageInfo.RatingViolence;
 
 public class FurryNetwork extends Site {
 	private WebDriver driver;
@@ -55,7 +56,7 @@ public class FurryNetwork extends Site {
 			this.driver.get("https://beta.furrynetwork.com/login/");
 			
 			// wait for login
-			WebDriverWait wait = new WebDriverWait(this.driver, 60);
+			WebDriverWait wait = new WebDriverWait(this.driver, Duration.ofSeconds(60));
 			wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("user-nav__button-menu__trigger")));
 			
 	//		driver.findElement(By.cssSelector("button.user-nav__click-icon.onclick")).click();

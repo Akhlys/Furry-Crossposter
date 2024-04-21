@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,15 +79,20 @@ public class FurAffinity extends Site {
 
 		this.driver.get("https://www.furaffinity.net/login/");
 		
-		removeMobileStuff();
+		removeMobileAndCookieStuff();
 		
 		// wait for login
-		WebDriverWait wait = new WebDriverWait(this.driver, 60);
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("my-username")));//By.xpath("(//*[@id='my-username'])")));//By.id("my-username")));
+		WebDriverWait wait = new WebDriverWait(this.driver, Duration.ofSeconds(60));
+		//wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//*[@id='my-username' and not (contains(@class, 'hideondesktop'))])")));//By.id("my-username")));//By.xpath("(//*[@id='my-username'])")));//By.id("my-username")));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("loggedin_user_avatar")));
+		removeMobileAndCookieStuff();
 		
-		this.driver.findElement(By.xpath("//a[@href='/submit/']")).click();
+		// wait again if page change through login
+		WebElement submitButton = this.driver.findElement(By.xpath("//a[@href='/submit/']"));
+		wait.until(ExpectedConditions.elementToBeClickable(submitButton));
+		submitButton.click();
 		
-		removeMobileStuff();
+		removeMobileAndCookieStuff();
 //		// default, "Artwork", is selected, just continue
 //		this.driver.findElement(By.xpath("//button[@value='Next']")).click();
 //		removeMobileStuff();
@@ -97,11 +103,7 @@ public class FurAffinity extends Site {
 			this.driver.findElement(By.name("thumbnail")).sendKeys(thumbPath.toString());
 		}
 		this.driver.findElement(By.xpath("//button[contains(.,'Upload')]")).click();
-		removeMobileStuff();
-		
-		// remove cookie overlay that may obscure clicks
-		JavascriptExecutor js = (JavascriptExecutor)this.driver;
-		js.executeScript("var cookiediv = document.getElementById('cookie-notification'); if (cookiediv) cookiediv.remove();");
+		removeMobileAndCookieStuff();
 		
 		this.driver.findElement(By.name("title")).sendKeys(imageInfo.getTitle());
 		this.driver.findElement(By.id("message")).sendKeys(imageInfo.getDescription());
@@ -266,10 +268,11 @@ public class FurAffinity extends Site {
 		return true;
 	}
 	
-	private void removeMobileStuff() {
+	private void removeMobileAndCookieStuff() {
 		JavascriptExecutor js = (JavascriptExecutor)this.driver;
 		js.executeScript("var mobileElements = document.getElementsByClassName('hideondesktop'); if (mobileElements) for (let elem of mobileElements) elem.remove();");
 		js.executeScript("var mobileElements = document.getElementsByClassName('mobile-navigation'); if (mobileElements) for (let elem of mobileElements) elem.remove();");
+		js.executeScript("var cookiebar = document.getElementById('cookie-notification'); if (cookiebar) cookiebar.remove();");
 	}
 
 	@Override
@@ -293,15 +296,16 @@ public class FurAffinity extends Site {
 				reasons.add("unsupported image type ." + extension);
 			} else {
 				// how about filesize
-				try {
-					long bytes = Files.size(imageInfo.getImagePath());
-					if (bytes > 10 * 1024 * 1024) { // 10 MB
-						reasons.add("image file too large (>10MB)");
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-					// shouldn't happen, but let's assume it's correct
-				}
+				// not testing it any more. resizing for resolution reasons should fix any too large file
+//				try {
+//					long bytes = Files.size(imageInfo.getImagePath());
+//					if (bytes > 10 * 1024 * 1024) { // 10 MB
+//						reasons.add("image file too large (>10MB)");
+//					}
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//					// shouldn't happen, but let's assume it's correct
+//				}
 			}
 		}
 
@@ -363,6 +367,17 @@ public class FurAffinity extends Site {
 			if (width > 1280 || height > 1280) {
 				reasons.add("image too large (>1280x1280), will be resized before upload");
 			}
+			// how about filesize
+			try {
+				long bytes = Files.size(imageInfo.getImagePath());
+				if (bytes > 10 * 1024 * 1024) { // 10 MB
+					reasons.add("image file too large (>10MB)");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				// shouldn't happen, but let's assume it's correct
+			}
+			
 
 			if (imageInfo.getThumbPath() != null) {
 				image = ImageIO.read(imageInfo.getThumbPath().toFile());
@@ -373,9 +388,10 @@ public class FurAffinity extends Site {
 					reasons.add("thumb too large (>1280x1280), will be resized before upload");
 				}
 			}
+			
 		} catch (IOException e) {
 			// If that generates an error, getErrorReasons() or the main window image display would already
-			// have reported it, eat the error
+			// have reported it, eat the error			
 			e.printStackTrace();
 		}
 

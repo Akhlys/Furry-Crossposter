@@ -2,6 +2,7 @@ package klaue.furrycrossposter.sites;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 
 import org.openqa.selenium.By;
@@ -35,7 +36,7 @@ public class SoFurry extends Site {
 		this.driver.get("https://www.sofurry.com/user/login");
 		
 		// wait for login
-		WebDriverWait wait = new WebDriverWait(this.driver, 60);
+		WebDriverWait wait = new WebDriverWait(this.driver, Duration.ofSeconds(60));
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@href='/upload']")));
 		
 		this.driver.get("https://www.sofurry.com/upload/details?contentType=1");

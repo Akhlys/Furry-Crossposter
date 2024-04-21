@@ -3,12 +3,8 @@ package klaue.furrycrossposter.sites;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
-
-import klaue.furrycrossposter.ImageInfo;
-import klaue.furrycrossposter.ImageInfo.Gender;
-import klaue.furrycrossposter.ImageInfo.RatingSexual;
-import klaue.furrycrossposter.ImageInfo.RatingViolence;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -16,6 +12,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import klaue.furrycrossposter.ImageInfo;
+import klaue.furrycrossposter.ImageInfo.Gender;
+import klaue.furrycrossposter.ImageInfo.RatingSexual;
+import klaue.furrycrossposter.ImageInfo.RatingViolence;
 
 public class Weasyl extends Site {
 	private WebDriver driver;
@@ -33,7 +34,7 @@ public class Weasyl extends Site {
 		this.driver.get("https://www.weasyl.com/signin");
 		
 		// wait for login
-		WebDriverWait wait = new WebDriverWait(this.driver, 60);
+		WebDriverWait wait = new WebDriverWait(this.driver, Duration.ofSeconds(60));
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
 
 		this.driver.findElement(By.xpath("//a[@href='/submit']")).click();

@@ -17,6 +17,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.TreeSet;
@@ -113,7 +114,7 @@ public class FirstStart extends JDialog implements WindowListener {
 				options.addArguments("profile-directory=" + chromeProfilePath.getFileName().toString());
 				options.addArguments("--start-maximized");
 				WebDriver webDriver = new ChromeDriver(options);
-				webDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+				webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
 				webDriver.get("https://www.google.com");
 				((JavascriptExecutor)webDriver).executeScript("alert('Furry Crossposter - chrome profile set up');");
 				

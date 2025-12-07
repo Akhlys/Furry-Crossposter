@@ -19,6 +19,8 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -64,6 +66,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
 import klaue.furrycrossposter.sites.DeviantArt;
 import klaue.furrycrossposter.sites.E621;
 import klaue.furrycrossposter.sites.FurAffinity;
@@ -126,6 +131,7 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 	
 	private JLabel lblNonworkingSizes = new JLabel();
 	private JButton btnLetsDoThisShit = new JButton("Let's do this! Select pages to upload to!");
+	private JButton btnOpenBrowser = new JButton("Open browser used manually (restart app after)");
 	
 	public MainWindow() {
 		this.imageInfo.addChangeListener(this);
@@ -135,7 +141,7 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		//fileChooser.setFileView(new ImageFileView());
 		
 		this.setTitle(windowTitle);
-		this.setSize(900, 768);
+		this.setSize(900, 788);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		
@@ -424,10 +430,23 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		this.lblNonworkingSizes.setFont(this.lblNonworkingSizes.getFont().deriveFont(Font.PLAIN));
 		mainPanel.add(this.lblNonworkingSizes);
 		mainPanel.add(Box.createVerticalStrut(10));
+		
+		mainPanel.add(new JLabel("<html><body>Note: some sites, like FA, use cloudflare protection for login. That usually blocks automated stuff.<br>"
+				+ "If you can't login, press the button below to open the browser manually, go to the website and login. Then try again.</body></html>"));
+		mainPanel.add(Box.createVerticalStrut(10));
 
+		JPanel pnlButtons = new JPanel();
+		pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.X_AXIS));
+		pnlButtons.setAlignmentX(LEFT_ALIGNMENT);
 		this.btnLetsDoThisShit.addActionListener(this);
 		this.btnLetsDoThisShit.setEnabled(false);
-		mainPanel.add(this.btnLetsDoThisShit);
+		this.btnOpenBrowser.addActionListener(this);
+		pnlButtons.add(this.btnLetsDoThisShit);
+		pnlButtons.add(Box.createHorizontalGlue());
+		pnlButtons.add(this.btnOpenBrowser);
+		mainPanel.add(pnlButtons);
+		
+		//this.pack();
 		
 		this.setVisible(true);
 	}
@@ -498,6 +517,30 @@ public class MainWindow extends JFrame implements ActionListener, DocumentListen
 		} else if (arg0.getSource() == this.btnLetsDoThisShit) {
 			// will only happen if at least one page works
 			new UploadDialog(this.imageInfo, pages);
+		} else if (arg0.getSource() == this.btnOpenBrowser) {
+			Path browserExePath = WebDriverManager.chromedriver().getBrowserPath().get();
+			if (browserExePath == null || !Files.exists(browserExePath)) {
+				JOptionPane.showMessageDialog(null, "Could not find browser executable", "FurryCrossposter", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			ProcessBuilder processBuilder = new ProcessBuilder(
+					browserExePath.toAbsolutePath().toString()
+            );
+			if (FurryCrossposter.chromeProfile != null) {
+				String profileDir = FurryCrossposter.chromeProfile.getParent().toString().replace("\\", "/");
+				processBuilder.command().add("--user-data-dir=" + profileDir);
+				processBuilder.command().add("--profile-directory=" + FurryCrossposter.chromeProfile.getFileName().toString());
+				//options.addArguments("--start-maximized");
+				//options.addArguments("--remote-allow-origins=*");
+			}
+			//System.out.println(browserExePath);
+			try {
+				System.out.println("starting");
+				processBuilder.start();
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(null, "Could not start browser: " + e.getMessage(), "FurryCrossposter", JOptionPane.ERROR_MESSAGE);
+				e.printStackTrace();
+			}
 		}
 	}
 

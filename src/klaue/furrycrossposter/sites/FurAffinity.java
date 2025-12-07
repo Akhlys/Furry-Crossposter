@@ -193,35 +193,36 @@ public class FurAffinity extends Site {
 		}
 		
 		// gender
-		Select genderList = new Select(this.driver.findElement(By.name("gender")));
-		if (imageInfo.getGenders().size() == 0) {
-			genderList.selectByValue("7"); // Other / Not Specified
-		} else if (imageInfo.getGenders().size() > 1) {
-			genderList.selectByValue("6"); // Multiple characters
-		} else {
-			Gender gender = imageInfo.getGenders().first();
-			switch(gender) {
-				case MALE:
-					genderList.selectByValue("2");
-					break;
-				case FEMALE:
-					genderList.selectByValue("3");
-					break;
-				case CUNTBOY:
-				case DICKGIRL:
-				case HERM:
-				case MALEHERM:
-					genderList.selectByValue("4");
-					break;
-				case F2M:
-				case M2F:
-					genderList.selectByValue("5");
-					break;
-				default:// never reached
-					genderList.selectByValue("0"); // Any
-					break;
-			}
-		}
+		// TODO: tag in once FA reversed it's stupid decision
+//		Select genderList = new Select(this.driver.findElement(By.name("gender")));
+//		if (imageInfo.getGenders().size() == 0) {
+//			genderList.selectByValue("7"); // Other / Not Specified
+//		} else if (imageInfo.getGenders().size() > 1) {
+//			genderList.selectByValue("6"); // Multiple characters
+//		} else {
+//			Gender gender = imageInfo.getGenders().first();
+//			switch(gender) {
+//				case MALE:
+//					genderList.selectByValue("2");
+//					break;
+//				case FEMALE:
+//					genderList.selectByValue("3");
+//					break;
+//				case CUNTBOY:
+//				case DICKGIRL:
+//				case HERM:
+//				case MALEHERM:
+//					genderList.selectByValue("4");
+//					break;
+//				case F2M:
+//				case M2F:
+//					genderList.selectByValue("5");
+//					break;
+//				default:// never reached
+//					genderList.selectByValue("0"); // Any
+//					break;
+//			}
+//		}
 		
 		// tags
 		String keywordTags = getTags(imageInfo);

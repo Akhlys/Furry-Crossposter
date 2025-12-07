@@ -29,7 +29,7 @@ public class UploadDialog extends JDialog implements ActionListener {
 		this.imageInfo = imageInfo;
 		
 		this.setTitle("Furry Crossposter - Upload");
-		this.setSize(700, 400);
+		this.setSize(700, 430);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		this.setModal(true);
@@ -102,6 +102,8 @@ public class UploadDialog extends JDialog implements ActionListener {
 			mainPanel.add(warnLabel);
 			mainPanel.add(Box.createVerticalStrut(10));
 		}
+		mainPanel.add(Box.createVerticalStrut(10));
+		mainPanel.add(new JLabel("<html><body>IMPORTANT: there seems to be a bug in the browser automator as of late. If nothing happens in the browser, close it and try again.</body></html>"));
 		mainPanel.add(Box.createVerticalStrut(10));
 		
 		// min. 1 page is eligible

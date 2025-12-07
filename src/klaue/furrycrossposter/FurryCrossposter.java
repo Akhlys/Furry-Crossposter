@@ -71,7 +71,7 @@ public class FurryCrossposter extends JFrame {
 		// now that we have a working dir, download latest driver
 		System.setProperty("wdm.targetPath", workingDir.toString());
 		WebDriverManager.chromedriver().setup();
-		System.out.println(WebDriverManager.chromedriver().getBrowserPath().get());
+		//System.out.println(WebDriverManager.chromedriver().getBrowserPath().get());
 //		ChromeDriverManager.getInstance().setup(Architecture
 //				.valueOf("x" + System.getProperty("sun.arch.data.model")), "2.38");
 		

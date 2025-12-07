@@ -82,7 +82,7 @@ import layout.TableLayoutConstants;
 import layout.TableLayoutConstraints;
 
 public class MainWindow extends JFrame implements ActionListener, DocumentListener, ChangeListener {
-	private static final String windowTitle = "Furry Crossposter by Double Helix Industries - 1.23";
+	private static final String windowTitle = "Furry Crossposter by Double Helix Industries - 1.24";
 	
 	private static final long serialVersionUID = 5580717767809657474L;
 	private static ArrayList<Site> pages = new ArrayList<>();
